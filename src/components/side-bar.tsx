@@ -78,7 +78,7 @@ export default function SideBar() {
           activeClass="bg-gray-200"
         >
           <TbWallet class="h-6 w-6 mr-2" />
-          <span class="text-gray-700">Carteras</span>
+          <span class="text-gray-700">Accounts</span>
         </A>
       </div>
     </div>

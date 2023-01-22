@@ -1,4 +1,4 @@
-import { createEffect, createResource, Show, Suspense } from 'solid-js';
+import { Show } from 'solid-js';
 import { createServerAction$, json } from 'solid-start/server';
 import {
   Drawer,
@@ -12,24 +12,11 @@ import {
 } from '~/components/drawer';
 import { initPocketBase } from '~/db';
 import { AiFillCheckCircle } from 'solid-icons/ai';
-import { createRouteData, RouteDataArgs } from 'solid-start';
+
 interface Props {
   className?: string;
   isOpen: boolean;
   onToggle: () => void;
-}
-
-export function routeData({ data }: Pick<RouteDataArgs, 'data'>) {
-  return createRouteData(async () => {
-    console.log(data);
-    console.log('Waiting for data');
-    const response = await fetch('https://hogwarts.deno.dev/students');
-    return await response.json();
-  });
-}
-
-async function delay(ms: number) {
-  return new Promise((resolve) => setTimeout(resolve, ms));
 }
 
 export function DrawerAccountForm(props: Props) {
@@ -55,45 +42,9 @@ export function DrawerAccountForm(props: Props) {
       );
     },
     {
-      invalidate: 'https://hogwarts.deno.dev/students',
+      invalidate: 'accounts',
     },
   );
-
-  // const [data, { mutate, refetch }] = createResource(async function fetchData(source, { value, refetching }) {
-  //   // Fetch the data and return a value.
-  //   //`source` tells you the current value of the source signal;
-  //   //`value` tells you the last returned value of the fetcher;
-  //   //`refetching` is true when the fetcher is triggered by calling `refetch()`,
-  //   // or equal to the optional data passed: `refetch(info)`
-
-  //   console.log('Fetching data');
-  //   console.log(enrolling.result);
-  //   const res = await enrolling.result?.json();
-  //   console.log(res);
-
-  //   return res;
-  // });
-
-  // const data = createRouteData(async function fetchData() {
-  //   console.log('Fetching data');
-
-  //   const res = await enrolling.result?.json();
-
-  //   return res;
-  // });
-  // const [data, { mutate, refetch }] = createResource(
-  //   'https://hogwarts.deno.dev/students',
-  //   routeData({
-  //     data: enrolling.result,
-  //   }),
-  // );
-
-  const [data, { refetch }] = createResource(enrolling.result, async () => {
-    debugger;
-    const res = async () => await enrolling.result?.json();
-    console.log(await res());
-    return res;
-  });
 
   return (
     <Drawer isOpen={props.isOpen} onToggle={props.onToggle} class="w-full max-w-xl">
@@ -119,7 +70,6 @@ export function DrawerAccountForm(props: Props) {
                 <p class="text-xl font-semibold text-gray-900">Your account was created successfully.</p>
 
                 <p class="text-lg text-gray-900">You can now add transactions to your account</p>
-                {/* Link button */}
                 <div class="mt-10">
                   <a
                     href="#"
@@ -160,6 +110,7 @@ export function DrawerAccountForm(props: Props) {
                 </label>
                 <select
                   id="account_type"
+                  name="account_type"
                   class="bg-slate-100 border text-md  py-4 mt-2 border-gray-300 text-gray-900 rounded-lg focus:ring-blue-500 focus:border-blue-500 block w-full p-2.5 appearance-none focus:bg-slate-200 "
                 >
                   <option selected>Choose an option</option>
