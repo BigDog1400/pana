@@ -13,4 +13,14 @@
     margin: 0;
     -moz-appearance: textfield !important;
   }
+
+  .table-wrapper td:first-child,
+  .table-wrapper th:first-child {
+    padding-left: 30px;
+  }
+
+  .table-wrapper td:last-child,
+  .table-wrapper th:last-child {
+    padding-right: 30px;
+  }
 }
