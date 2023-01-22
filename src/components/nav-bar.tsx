@@ -9,7 +9,7 @@ interface Props {
 export default function NavBar(props: Props) {
   const breadcrumbs = [
     {
-      name: 'Transacciones',
+      name: 'Transactions',
       path: '/app/transactions',
       children: [
         {
@@ -19,7 +19,7 @@ export default function NavBar(props: Props) {
       ],
     },
     {
-      name: 'Carteras',
+      name: 'Accounts',
       path: '/app/wallets',
     },
   ];
@@ -46,12 +46,12 @@ export default function NavBar(props: Props) {
   };
 
   return (
-    <div class="sticky top-0 z-40">
+    <div class="z-40">
       <div class="w-full h-20 px-6 flex items-center justify-between">
         {/* <!-- left navbar --> */}
         <div class="flex">
           {/* <!-- mobile hamburger --> */}
-          <div class="inline-block lg:hidden flex items-center mr-4">
+          <div class="lg:hidden flex items-center mr-4">
             {/* @click="toggleSidebar() */}
             <button class="hover:text-blue-500 hover:border-white focus:outline-none navbar-burger">
               <svg
