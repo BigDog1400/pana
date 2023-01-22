@@ -58,7 +58,11 @@ export default function Wallets() {
                 <tr>
                   <th scope="col" class="p-4">
                     <div class="flex items-center">
-                      <input id="checkbox-all-search" type="checkbox" class="w-5 h-5 bg-gray-100 border-gray-300" />
+                      <input
+                        id="checkbox-all-search"
+                        type="checkbox"
+                        class="w-5 h-5 bg-gray-100 border-gray-300 cursor-pointer"
+                      />
                       <label for="checkbox-all-search" class="sr-only">
                         checkbox
                       </label>
@@ -84,7 +88,7 @@ export default function Wallets() {
                     <tr class="border-b hover:bg-gray-100 ">
                       <td class="w-4 p-4">
                         <div class="flex items-center">
-                          <input id="checkbox-table-search-3" type="checkbox" class="w-5 h-5" />
+                          <input id="checkbox-table-search-3" type="checkbox" class="w-5 h-5 cursor-pointer" />
                           <label for="checkbox-table-search-3" class="sr-only">
                             checkbox
                           </label>
