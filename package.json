@@ -20,11 +20,14 @@
   "dependencies": {
     "@solidjs/meta": "^0.28.0",
     "@solidjs/router": "^0.6.0",
+    "clsx": "^1.2.1",
+    "cva": "npm:class-variance-authority@^0.4.0",
     "pocketbase": "^0.9.1",
     "solid-headless": "^0.13.0",
     "solid-icons": "^1.0.4",
     "solid-js": "^1.6.2",
     "solid-start": "^0.2.0",
+    "tailwind-merge": "^1.8.1",
     "undici": "^5.11.0"
   },
   "engines": {

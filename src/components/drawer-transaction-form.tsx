@@ -12,8 +12,9 @@ import {
 } from '~/components/drawer';
 import { initPocketBase } from '~/db';
 import { AiFillCheckCircle } from 'solid-icons/ai';
-import { Button } from 'solid-headless';
 import { RouteDataArgs, useRouteData } from 'solid-start';
+import { Input, Select } from '~/modules/ui/components/form';
+import { Button } from '~/modules/ui/components/button';
 
 interface Props {
   className?: string;
@@ -128,53 +129,36 @@ export function DrawerTransactionForm(props: Props) {
               </div>
             }
           >
-            <Form class={'mt-10'} id="account-form">
-              <div class="mb-6 w-full">
-                <input
-                  type="text"
-                  name="description"
-                  id="description"
-                  class="w-full rounded bg-slate-100 py-4 px-8 outline-blue-500 placeholder:font-semibold hover:ring-1
-         focus:bg-slate-200 
-          "
-                  placeholder="Description (optional)"
-                />
-              </div>
-              <div class="mb-6 w-full">
-                <input
-                  type="date"
-                  name="date"
-                  id="date"
-                  class="w-full appearance-none rounded bg-slate-100 py-4 px-8 outline-blue-500 placeholder:font-semibold hover:ring-1"
-                  placeholder="Date"
-                  required
-                />
-              </div>
-              <div class="mb-6 w-full">
-                <input
-                  type="number"
-                  name="amount"
-                  id="amount"
-                  class="w-full appearance-none rounded bg-slate-100 py-4 px-8 outline-blue-500 placeholder:font-semibold hover:ring-1"
-                  placeholder="Amount"
-                  required
-                />
-              </div>
-              <fieldset class="mb-6 w-full">
+            <Form class={'mt-6 grid gap-5'} id="account-form">
+              <fieldset class="w-full">
+                <label for="description" class="mb-2 block text-sm font-semibold text-gray-900">
+                  Description
+                </label>
+
+                <Input type="text" name="description" id="description" placeholder="Description (optional)" />
+              </fieldset>
+              <fieldset class="w-full">
+                <label for="date" class="mb-2 block text-sm font-semibold text-gray-900">
+                  Date
+                </label>
+                <Input type="date" name="date" id="date" placeholder="Date" required />
+              </fieldset>
+              <fieldset class="w-full">
+                <label for="amount" class="mb-2 block text-sm font-semibold text-gray-900">
+                  Amount
+                </label>
+                <Input type="number" name="amount" id="amount" placeholder="Amount" required />
+              </fieldset>
+              <fieldset class="w-full">
                 <label
                   for="
                 budget_cat_id
                 "
-                  class=""
+                  class="mb-2 block text-sm font-semibold text-gray-900"
                 >
                   Budget category
                 </label>
-                <select
-                  id="budget_cat_id_"
-                  name="budget_cat_id_"
-                  required
-                  class="text-md mt-2 block  w-full appearance-none rounded-lg border border-gray-300 bg-slate-100 p-2.5 py-4 text-gray-900 focus:border-blue-500 focus:bg-slate-200 focus:ring-blue-500 "
-                >
+                <Select id="budget_cat_id_" name="budget_cat_id_" required class="mt-1">
                   <option value={''} selected>
                     Choose an option
                   </option>
@@ -182,30 +166,24 @@ export function DrawerTransactionForm(props: Props) {
                   <For each={data()?.categories.data}>
                     {(account) => <option value={account.id}>{account.name}</option>}
                   </For>
-                </select>
+                </Select>
               </fieldset>
 
               <Show when={data.state === 'ready'}>
-                <fieldset class="mb-6 w-full">
-                  <label for="account_id" class="">
+                <fieldset class="w-full">
+                  <label for="account_id" class="mb-2 block text-sm font-semibold text-gray-900">
                     Account
                   </label>
-                  <select
-                    id="account_id"
-                    name="account_id"
-                    required
-                    class="text-md mt-2 block  w-full appearance-none rounded-lg border border-gray-300 bg-slate-100 p-2.5 py-4 text-gray-900 focus:border-blue-500 focus:bg-slate-200 focus:ring-blue-500 "
-                  >
+                  <Select id="account_id" name="account_id" required class="mt-1">
                     <option value={''} selected>
                       Choose an account
                     </option>
                     <For each={data()?.accounts.data}>
                       {(account) => <option value={account.id}>{account.name}</option>}
                     </For>
-                  </select>
+                  </Select>
                 </fieldset>
               </Show>
-              <div class="mb-6 w-full"></div>
             </Form>
           </Show>
           {/* </ErrorBoundary> */}
@@ -214,17 +192,19 @@ export function DrawerTransactionForm(props: Props) {
         <Show when={!enrolling.result}>
           <DrawerFooter>
             <div class="flex justify-end gap-2">
-              <button class="w-full rounded border-2 border-black bg-white py-4 font-bold text-black  hover:bg-opacity-90">
+              <Button fw={'semibold'} variant={'secondary'} disabled>
                 Cancelar
-              </button>
-              <button
+              </Button>
+              <Button
+                fw={'semibold'}
                 form="account-form"
                 type="submit"
-                class="w-full rounded bg-black py-4 font-bold text-white  hover:bg-opacity-90"
-                disabled={enrolling.pending}
+                // class="w-full rounded bg-black py-4 font-bold text-white  hover:bg-opacity-90"
+                disabled={true}
+                // disabled={enrolling.pending}
               >
                 Agregar
-              </button>
+              </Button>
             </div>
           </DrawerFooter>
         </Show>
