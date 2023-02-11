@@ -6,8 +6,9 @@ import { RouteDataArgs, useRouteData } from 'solid-start';
 import { initPocketBase } from '~/db';
 import { TbDots, TbPlus } from 'solid-icons/tb';
 import { TbArrowRight } from 'solid-icons/tb';
-import { DrawerBudgetForm } from '~/components/drawer-budget-form';
+import { DrawerBudgetTargetForm } from '~/components/drawer-budget-target-form';
 import { Button } from '~/modules/ui/components/button';
+import { DrawerUpdateTargetBudgetForm } from '~/components/drawer-update-target-budget-form';
 export interface Root2 {
   collectionId: string;
   collectionName: string;
@@ -207,18 +208,27 @@ function BudgetGroup({ group }: { group: Root2 }) {
 }
 
 function BudgetCategory(props: { data: BudgetCategoriesGroupId }) {
-  const [showModal, setShowModal] = createSignal(false);
+  const [showCreateModal, setShowCreateModal] = createSignal(false);
+  const [showUpdateModal, setShowUpdateModal] = createSignal(false);
   return (
     <>
       <tr
         class="cursor-pointer border-b hover:bg-gray-100"
         onClick={() => {
-          setShowModal(true);
+          if (props.data.expand.budget_target) {
+            setShowUpdateModal(true);
+          } else {
+            setShowCreateModal(true);
+          }
         }}
         tabIndex="0"
         onkeydown={(e) => {
           if (e.key === 'Enter') {
-            setShowModal(true);
+            if (props.data.expand.budget_target) {
+              setShowUpdateModal(true);
+            } else {
+              setShowCreateModal(true);
+            }
           }
         }}
       >
@@ -268,25 +278,39 @@ function BudgetCategory(props: { data: BudgetCategoriesGroupId }) {
           <TbArrowRight />
         </td>
       </tr>
-      <DrawerBudgetForm
-        date={
-          new Date(
-            Date.UTC(
-              Number(props.data.expand.budget_target?.year) || new Date().getFullYear(),
-              Number(props.data.expand.budget_target?.month) || new Date().getMonth(),
-            ),
-          )
-        }
-        budgetGroup={{
-          group_id: props.data.group_id,
-          id: props.data.id,
-          name: props.data.name,
-        }}
-        isOpen={showModal()}
-        onToggle={() => {
-          setShowModal(!showModal());
-        }}
-      />
+      <Show when={!props?.data?.expand?.budget_target && showCreateModal()}>
+        <DrawerBudgetTargetForm
+          date={
+            new Date(
+              Date.UTC(
+                Number(props.data.expand.budget_target?.year) || new Date().getFullYear(),
+                Number(props.data.expand.budget_target?.month) || new Date().getMonth(),
+              ),
+            )
+          }
+          budgetGroup={{
+            group_id: props.data.group_id,
+            id: props.data.id,
+            name: props.data.name,
+          }}
+          isOpen={showCreateModal()}
+          onToggle={() => {
+            setShowCreateModal(!showCreateModal());
+          }}
+        />
+      </Show>
+      <Show when={props?.data?.expand?.budget_target && showUpdateModal()}>
+        <DrawerUpdateTargetBudgetForm
+          initialValues={{
+            amount: props.data.expand.budget_target?.budgeted_amount!,
+            id: props.data.expand.budget_target?.id!,
+          }}
+          isOpen={showUpdateModal()}
+          onToggle={() => {
+            setShowUpdateModal(!showUpdateModal());
+          }}
+        />
+      </Show>
     </>
   );
 }

@@ -20,26 +20,21 @@ interface Props {
   className?: string;
   isOpen: boolean;
   onToggle: () => void;
-  budgetGroup: {
-    group_id: string;
+
+  initialValues: {
+    amount: number;
     id: string;
-    name: string;
   };
-  date: Date;
 }
 
-export function DrawerBudgetForm(props: Props) {
+export function DrawerUpdateTargetBudgetForm(props: Props) {
   const [enrolling, { Form }] = createServerAction$(async (form: FormData, { request }) => {
     const pb = await initPocketBase(request);
     const userId = pb.authStore.model?.id;
-    // Parse the date from the form tu UTC
 
     try {
-      const record = await pb.collection('budget_targets').create({
-        budget_cat_id: form.get('budget_cat_id'),
+      const record = await pb.collection('budget_targets').update(form.get('id') as string, {
         budgeted_amount: form.get('budgeted_amount'),
-        user_id: userId,
-        date: form.get('date'),
       });
 
       return json(
@@ -79,13 +74,14 @@ export function DrawerBudgetForm(props: Props) {
       let result: {
         success: boolean;
         error: {
-          code: number;
-          message: string;
-          data: Record<string, string>;
+          data: {
+            code: number;
+            message: string;
+            data: Record<string, string>;
+          };
         };
       } = await enrolling.result?.json();
-
-      setError(result.error);
+      if (result?.error?.data) setError(result?.error?.data);
     }
   });
 
@@ -94,8 +90,8 @@ export function DrawerBudgetForm(props: Props) {
       <DrawerOverlay />
       <DrawerContent>
         <DrawerHeader>
-          <DrawerTitle>Add budget target</DrawerTitle>
-          <DrawerDescription>Fill the form below to add a new budget target.</DrawerDescription>
+          <DrawerTitle>Update budget target</DrawerTitle>
+          <DrawerDescription>Fill the form below to update your budget target.</DrawerDescription>
         </DrawerHeader>
         <DrawerBody>
           <Show
@@ -105,10 +101,10 @@ export function DrawerBudgetForm(props: Props) {
                 <div class="flex items-center text-green-500">
                   <AiFillCheckCircle size={40} color="currentColor" />
                 </div>
-                <p class="text-xl font-semibold text-gray-900">Budget target added.</p>
+                <p class="text-xl font-semibold text-gray-900">Budget target updated</p>
 
                 <p class="mt-5 text-center text-lg text-gray-900">
-                  Your budget target has been added successfully. You can close this form now.
+                  Your budget target has been updated successfully. You can close this form now.
                 </p>
                 <div class="mt-6">
                   <Button
@@ -133,14 +129,20 @@ export function DrawerBudgetForm(props: Props) {
                 <label for="budgeted_amount" class="mb-2 block text-sm font-semibold text-gray-900">
                   Budget target
                 </label>
-                <Input type="number" name="budgeted_amount" id="budgeted_amount" placeholder="Amount" required />
+                <Input
+                  type="number"
+                  name="budgeted_amount"
+                  id="budgeted_amount"
+                  placeholder="Amount"
+                  required
+                  value={props.initialValues.amount}
+                />
               </fieldset>
-              <input type="hidden" name="budget_cat_id" value={props.budgetGroup.id} />
-              <input type="hidden" name="date" value={props.date.toISOString()} />
+              <input type="hidden" name="id" value={props.initialValues.id} />
             </Form>
           </Show>
 
-          <Show when={error()}>
+          <Show when={error() && !result()}>
             <div
               class="mt-4 rounded-md border border-red-300
             bg-red-100 p-4 text-sm font-semibold text-red-500"
