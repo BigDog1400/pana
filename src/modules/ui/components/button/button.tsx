@@ -2,7 +2,7 @@ import { cva, type VariantProps } from 'cva';
 import { splitProps } from 'solid-js';
 import type { JSX } from 'solid-js/jsx-runtime';
 // ⚠️ Disclaimer: Use of Tailwind CSS is optional
-const button = cva('rounded transition-all', {
+const button = cva('rounded transition-all inline-flex justify-center items-center gap-2', {
   variants: {
     variant: {
       primary: [
@@ -24,7 +24,7 @@ const button = cva('rounded transition-all', {
       outline: ['bg-transparent', 'text-black', 'border-2', 'border-black', 'hover:bg-opacity-90'],
     },
     size: {
-      medium: ['py-1', 'px-8', 'text-sm', 'min-h-[2.5rem]'],
+      medium: ['py-1', 'px-5', 'text-sm', 'min-h-[2.5rem]'],
     },
     width: {
       full: ['w-full'],

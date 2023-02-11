@@ -64,7 +64,6 @@ export function DrawerAccountForm(props: Props) {
           <Show
             when={!enrolling.result}
             fallback={
-              // success
               <div class="mt-10 flex flex-col items-center justify-center">
                 <div class="flex items-center text-green-500">
                   <AiFillCheckCircle size={40} color="currentColor" />

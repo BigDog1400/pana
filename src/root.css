@@ -18,7 +18,19 @@
   .table-wrapper th:first-child {
     padding-left: 30px;
   }
+  .table-wrapper .txt-ellipsis {
+    display: inline-block;
+    vertical-align: top;
+    flex-shrink: 0;
+    max-width: 100%;
+    overflow: hidden;
+    white-space: nowrap;
+    text-overflow: ellipsis;
+  }
 
+  .table-wrapper .col-type-text {
+    max-width: 300px;
+  }
   .table-wrapper td:last-child,
   .table-wrapper th:last-child {
     padding-right: 30px;

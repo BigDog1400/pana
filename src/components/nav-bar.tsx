@@ -19,6 +19,10 @@ export default function NavBar(props: Props) {
       ],
     },
     {
+      name: 'Budgets',
+      path: '/app/budgets',
+    },
+    {
       name: 'Accounts',
       path: '/app/wallets',
     },
@@ -47,13 +51,13 @@ export default function NavBar(props: Props) {
 
   return (
     <div class="z-40">
-      <div class="w-full h-20 px-6 flex items-center justify-between">
+      <div class="flex h-20 w-full items-center justify-between px-6">
         {/* <!-- left navbar --> */}
         <div class="flex">
           {/* <!-- mobile hamburger --> */}
-          <div class="lg:hidden flex items-center mr-4">
+          <div class="mr-4 flex items-center lg:hidden">
             {/* @click="toggleSidebar() */}
-            <button class="hover:text-blue-500 hover:border-white focus:outline-none navbar-burger">
+            <button class="navbar-burger hover:border-white hover:text-blue-500 focus:outline-none">
               <svg
                 class="h-5 w-5"
                 v-bind:style="{ fill: 'black' }"
@@ -66,10 +70,10 @@ export default function NavBar(props: Props) {
             </button>
           </div>
           {/* Breadcumbs */}
-          <div class="hidden lg:flex items-center">
+          <div class="hidden items-center lg:flex">
             <For each={activeBreadcrumbs()}>
               {(breadcrumb, index) => (
-                <div class="flex items">
+                <div class="items flex">
                   <span
                     class={`text-xl ${index() === activeBreadcrumbs().length - 1 ? 'text-black' : 'text-gray-500'}`}
                   >
