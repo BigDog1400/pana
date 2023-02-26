@@ -9,6 +9,7 @@ import { TbArrowRight } from 'solid-icons/tb';
 import { DrawerBudgetTargetForm } from '~/components/drawer-budget-target-form';
 import { Button } from '~/modules/ui/components/button';
 import { DrawerUpdateTargetBudgetForm } from '~/components/drawer-update-target-budget-form';
+import { DrawerBudgetCategoryTargetForm } from '~/components/drawer-budget-category-form';
 export interface Root2 {
   collectionId: string;
   collectionName: string;
@@ -155,7 +156,7 @@ function BudgetGroup({ group }: { group: Root2 }) {
           <h3 class="text-4xl font-light capitalize">{group.name.toLowerCase()}</h3>
           <Button variant={'outline'} fw="semibold" onClick={() => setShowDrawer(true)}>
             <RiSystemAddFill />
-            Add new budget target
+            Add new budget category
           </Button>
         </div>
         <div class="relative overflow-x-auto">
@@ -197,6 +198,15 @@ function BudgetGroup({ group }: { group: Root2 }) {
           </table>
         </div>
       </div>
+      <DrawerBudgetCategoryTargetForm
+        budgetGroup={{
+          id: group.id,
+        }}
+        isOpen={showDrawer()}
+        onToggle={() => {
+          setShowDrawer(!showDrawer());
+        }}
+      />
       {/* <DrawerBudgetForm
         isOpen={showDrawer()}
         onToggle={() => {
@@ -288,7 +298,7 @@ function BudgetCategory(props: { data: BudgetCategoriesGroupId }) {
               ),
             )
           }
-          budgetGroup={{
+          budgetCategory={{
             group_id: props.data.group_id,
             id: props.data.id,
             name: props.data.name,

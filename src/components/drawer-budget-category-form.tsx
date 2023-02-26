@@ -1,5 +1,5 @@
-import { createEffect, createSignal, Show } from 'solid-js';
-import { createServerAction$, json } from 'solid-start/server';
+import { createEffect, createResource, createSignal, ErrorBoundary, For, Show } from 'solid-js';
+import { createServerAction$, createServerData$, json } from 'solid-start/server';
 import {
   Drawer,
   DrawerBody,
@@ -12,33 +12,27 @@ import {
 } from '~/components/drawer';
 import { initPocketBase } from '~/db';
 import { AiFillCheckCircle } from 'solid-icons/ai';
-import { Input } from '~/modules/ui/components/form';
+import { RouteDataArgs, useRouteData } from 'solid-start';
+import { Input, Select } from '~/modules/ui/components/form';
 import { Button } from '~/modules/ui/components/button';
 import { ClientResponseError } from 'pocketbase';
 interface Props {
   className?: string;
   isOpen: boolean;
   onToggle: () => void;
-  budgetCategory: {
-    group_id: string;
+  budgetGroup: {
     id: string;
-    name: string;
   };
-  date: Date;
 }
 
-export function DrawerBudgetTargetForm(props: Props) {
+export function DrawerBudgetCategoryTargetForm(props: Props) {
   const [enrolling, { Form }] = createServerAction$(async (form: FormData, { request }) => {
     const pb = await initPocketBase(request);
-    const userId = pb.authStore.model?.id;
-    // Parse the date from the form tu UTC
 
     try {
-      const record = await pb.collection('budget_targets').create({
-        budget_cat_id: form.get('budget_cat_id'),
-        budgeted_amount: form.get('budgeted_amount'),
-        user_id: userId,
-        date: form.get('date'),
+      const record = await pb.collection('budget_categories').create({
+        group_id: form.get('group_id'),
+        name: form.get('name'),
       });
 
       return json(
@@ -78,13 +72,15 @@ export function DrawerBudgetTargetForm(props: Props) {
       let result: {
         success: boolean;
         error: {
-          code: number;
-          message: string;
-          data: Record<string, string>;
+          data: {
+            code: number;
+            message: string;
+            data: Record<string, string>;
+          };
         };
       } = await enrolling.result?.json();
 
-      setError(result.error);
+      if (result?.error?.data) setError(result?.error?.data);
     }
   });
 
@@ -93,8 +89,8 @@ export function DrawerBudgetTargetForm(props: Props) {
       <DrawerOverlay />
       <DrawerContent>
         <DrawerHeader>
-          <DrawerTitle>Add budget target</DrawerTitle>
-          <DrawerDescription>Fill the form below to add a new budget target.</DrawerDescription>
+          <DrawerTitle>Add budget category</DrawerTitle>
+          <DrawerDescription>Fill the form below to add a new budget category.</DrawerDescription>
         </DrawerHeader>
         <DrawerBody>
           <Show
@@ -104,10 +100,10 @@ export function DrawerBudgetTargetForm(props: Props) {
                 <div class="flex items-center text-green-500">
                   <AiFillCheckCircle size={40} color="currentColor" />
                 </div>
-                <p class="text-xl font-semibold text-gray-900">Budget target added.</p>
+                <p class="text-xl font-semibold text-gray-900">Budget category added</p>
 
                 <p class="mt-5 text-center text-lg text-gray-900">
-                  Your budget target has been added successfully. You can close this form now.
+                  Your budget category has been added successfully. You can close this form now.
                 </p>
                 <div class="mt-6">
                   <Button
@@ -129,13 +125,12 @@ export function DrawerBudgetTargetForm(props: Props) {
           >
             <Form class={'mt-6 grid gap-5'} id="account-form">
               <fieldset class="w-full">
-                <label for="budgeted_amount" class="mb-2 block text-sm font-semibold text-gray-900">
-                  Budget target
+                <label for="name" class="mb-2 block text-sm font-semibold text-gray-900">
+                  Category name
                 </label>
-                <Input type="number" name="budgeted_amount" id="budgeted_amount" placeholder="Amount" required />
+                <Input type="text" name="name" id="name" placeholder="Name" required />
               </fieldset>
-              <input type="hidden" name="budget_cat_id" value={props.budgetCategory.id} />
-              <input type="hidden" name="date" value={props.date.toISOString()} />
+              <input type="hidden" name="group_id" value={props.budgetGroup.id} />
             </Form>
           </Show>
 
@@ -144,7 +139,7 @@ export function DrawerBudgetTargetForm(props: Props) {
               class="mt-4 rounded-md border border-red-300
             bg-red-100 p-4 text-sm font-semibold text-red-500"
             >
-              {error()?.message || 'An error occurred while adding your budget target.'}
+              {error()?.message || 'An error occurred while adding your budget category.'}
             </div>
           </Show>
           <Show when={enrolling.error}>
@@ -152,7 +147,7 @@ export function DrawerBudgetTargetForm(props: Props) {
               class="mt-4 rounded-md border border-red-300
             bg-red-100 p-4 text-sm font-semibold text-red-500"
             >
-              {enrolling.error?.message || 'An error happened while adding your budget target.'}
+              {enrolling.error?.message || 'An error happened while adding your budget category.'}
             </div>
           </Show>
         </DrawerBody>
