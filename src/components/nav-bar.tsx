@@ -4,6 +4,9 @@ import type { JSX } from 'solid-js/jsx-runtime';
 import { CgMenu } from 'solid-icons/cg';
 interface Props {
   rightElement?: JSX.Element;
+  leftElement?: JSX.Element;
+  classLeftElementWrapper?: string;
+  classRightElementWrapper?: string;
 }
 
 export default function NavBar(props: Props) {
@@ -83,6 +86,7 @@ export default function NavBar(props: Props) {
               )}
             </For>
           </div>
+
           {/* <!-- search bar --> */}
           {/* <div class="relative text-gray-600">
             <input
@@ -109,6 +113,8 @@ export default function NavBar(props: Props) {
             </button>
           </div> */}
         </div>
+        <div class={props.classLeftElementWrapper}>{props.leftElement}</div>
+
         {/* <!-- right navbar --> */}
         {/* add | html entity */}
         <div class="">{props.rightElement}</div>

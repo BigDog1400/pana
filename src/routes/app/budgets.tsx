@@ -2,9 +2,9 @@ import NavBar from '~/components/nav-bar';
 import { RiSystemAddFill } from 'solid-icons/ri';
 import { createSignal, For, Show, Suspense } from 'solid-js';
 import { createServerData$, json } from 'solid-start/server';
-import { RouteDataArgs, useRouteData } from 'solid-start';
+import { A, RouteDataArgs, useLocation, useRouteData } from 'solid-start';
 import { initPocketBase } from '~/db';
-import { TbDots, TbPlus } from 'solid-icons/tb';
+import { TbArrowLeft, TbDots, TbPlus } from 'solid-icons/tb';
 import { TbArrowRight } from 'solid-icons/tb';
 import { DrawerBudgetTargetForm } from '~/components/drawer-budget-target-form';
 import { Button } from '~/modules/ui/components/button';
@@ -60,9 +60,15 @@ export interface Expand3 {}
 export function routeData({ location }: RouteDataArgs) {
   return createServerData$(
     async ([_, month, year], { request }) => {
-      const date = new Date(Date.UTC(Number(year) || new Date().getFullYear(), Number(month) || new Date().getMonth()));
+      const date = new Date(
+        Date.UTC(Number(year) || new Date().getFullYear(), month ? Number(month) : new Date().getMonth()),
+      );
+      console.log(date);
       const result = date.toISOString().split('T')[0];
       const [year_, month_] = result.split('-');
+
+      console.log('year', year_);
+      console.log('month', month_);
 
       const pb = await initPocketBase(request);
 
@@ -70,7 +76,7 @@ export function routeData({ location }: RouteDataArgs) {
         expand: 'budget_categories(group_id)',
       });
 
-      console.log(JSON.stringify(resultList, null, 2));
+      // console.log(JSON.stringify(resultList, null, 2));
       // Map over each budget group
       const updatedResultList = await Promise.all(
         resultList?.map(async (group) => {
@@ -133,9 +139,63 @@ export function routeData({ location }: RouteDataArgs) {
 export default function Budget() {
   const budgets = useRouteData<typeof routeData>();
   const [showDrawer, setShowDrawer] = createSignal(false);
+  const location = useLocation();
+
+  const getPreviousDate = () => {
+    if (location.query['m'] === '0' || new Date().getMonth() === 0) {
+      return '/app/budgets?m=11&y=' + (Number(location.query['y']) - 1 || new Date().getFullYear() - 1);
+    } else {
+      return (
+        '/app/budgets?m=' +
+        (Number(location.query['m']) - 1 || new Date().getMonth() - 1) +
+        '&y=' +
+        (location.query['y'] || new Date().getFullYear())
+      );
+    }
+  };
+
+  const getNextDate = () => {
+    if (location.query['m'] === '11' || new Date().getMonth() === 11) {
+      return '/app/budgets?m=0&y=' + (Number(location.query['y']) + 1 || new Date().getFullYear() + 1);
+    } else {
+      return (
+        '/app/budgets?m=' +
+        (Number(location.query['m']) + 1 || new Date().getMonth() + 1) +
+        '&y=' +
+        (location.query['y'] || new Date().getFullYear())
+      );
+    }
+  };
+
   return (
     <>
-      <NavBar />
+      <NavBar
+        rightElement={
+          <div>
+            <A
+              // href={`/app/budgets?m=${Number(location.query['m']) - 1 || new Date().getMonth() - 1}&y=${
+              //   location.query['y'] || new Date().getFullYear()
+              // }`}
+              href={getPreviousDate()}
+              class="inline-flex min-h-[2.5rem] items-center justify-center gap-2 rounded-md border-2 border-black bg-transparent py-1 px-5 text-sm font-semibold text-black transition-all hover:bg-opacity-90"
+            >
+              <TbArrowLeft />
+            </A>
+            <span class="mx-2 font-semibold capitalize text-gray-500">
+              {new Date(
+                Number(location.query['y']) || new Date().getFullYear(),
+                location.query['m'] ? Number(location.query['m']) : new Date().getMonth(),
+              ).toLocaleString('default', { month: 'long', year: 'numeric' })}
+            </span>
+            <A
+              href={getNextDate()}
+              class="inline-flex min-h-[2.5rem] items-center justify-center gap-2 rounded-md border-2 border-black bg-transparent py-1 px-5 text-sm font-semibold text-black transition-all hover:bg-opacity-90"
+            >
+              <TbArrowRight />
+            </A>
+          </div>
+        }
+      />
       <div class="">
         {/* This works. It renders the budgets */}
 
