@@ -1,4 +1,4 @@
-import { createResource, ErrorBoundary, For, Show } from 'solid-js';
+import { createResource, createSignal, ErrorBoundary, For, Show } from 'solid-js';
 import { createServerAction$, createServerData$, json } from 'solid-start/server';
 import {
   Drawer,
@@ -35,16 +35,21 @@ async function fetchData(
   const accountsResponse = await fetch('/api/accounts');
   const accounts = await accountsResponse.json();
   const categoriesResponse = await fetch('/api/budget-categories');
-  const categories = await categoriesResponse.json();
+  const budget_categories = await categoriesResponse.json();
+  const incomeCategoriesResponse = await fetch('/api/income-categories');
+  const income_categories = await incomeCategoriesResponse.json();
 
+  if (!incomeCategoriesResponse.ok) {
+    throw new Error(`An error occurred while fetching income categories. ${income_categories?.error}`);
+  }
   if (!accountsResponse.ok) {
     throw new Error(`An error occurred while fetching accounts. ${accounts?.error}`);
   }
   if (!categoriesResponse.ok) {
-    throw new Error(`An error occurred while fetching categories. ${categories?.error}`);
+    throw new Error(`An error occurred while fetching categories. ${budget_categories?.error}`);
   }
 
-  return { accounts, categories };
+  return { accounts, budget_categories, income_categories };
 }
 
 export function DrawerTransactionForm(props: Props) {
@@ -52,6 +57,7 @@ export function DrawerTransactionForm(props: Props) {
     async (form: FormData, { request }) => {
       const pb = await initPocketBase(request);
       const userId = pb.authStore.model?.id;
+      debugger;
 
       try {
         const record = await pb.collection('transactions').create({
@@ -61,6 +67,8 @@ export function DrawerTransactionForm(props: Props) {
           budget_cat_id_: form.get('budget_cat_id_'),
           account_id: form.get('account_id'),
           user_id: userId,
+          transaction_type: form.get('transaction_type'),
+          income_category_id: form.get('income_category_id'),
         });
 
         return json(
@@ -88,7 +96,7 @@ export function DrawerTransactionForm(props: Props) {
   );
 
   const [data, { mutate, refetch }] = createResource(fetchData);
-
+  const [transaction, setTransaction] = createSignal<'expense' | 'income'>('expense');
   return (
     <Drawer isOpen={props.isOpen} onToggle={props.onToggle} class="w-full max-w-xl">
       <DrawerOverlay />
@@ -130,6 +138,42 @@ export function DrawerTransactionForm(props: Props) {
             }
           >
             <Form class={'mt-6 grid gap-5'} id="account-form">
+              <div class="mb-6 w-full">
+                <fieldset
+                  class={`flex w-full flex-row items-center justify-center gap-x-1`}
+                  onchange={(e) => {
+                    if ('checked' in e.target && 'value' in e.target) {
+                      setTransaction(e.target.value as 'expense' | 'income');
+                    }
+                  }}
+                >
+                  <div class="flex w-full">
+                    <input
+                      type="radio"
+                      name="transaction_type"
+                      value="expense"
+                      id="expense"
+                      class="peer hidden"
+                      checked
+                    />
+                    <label
+                      class="w-full cursor-pointer rounded-md bg-white p-2 text-center text-xl font-bold text-black hover:bg-[#f5f5f5] peer-checked:shadow-[0_0_0_2px_black]"
+                      for="expense"
+                    >
+                      Expense
+                    </label>
+                  </div>
+                  <div class="flex w-full">
+                    <input type="radio" id="income" name="transaction_type" class="peer hidden" value="income" />
+                    <label
+                      class="w-full cursor-pointer rounded-md bg-white p-2  text-center text-xl font-bold text-black hover:bg-[#f5f5f5] peer-checked:shadow-[0_0_0_2px_black]"
+                      for="income"
+                    >
+                      Income
+                    </label>
+                  </div>
+                </fieldset>
+              </div>
               <fieldset class="w-full">
                 <label for="description" class="mb-2 block text-sm font-semibold text-gray-900">
                   Description
@@ -149,25 +193,48 @@ export function DrawerTransactionForm(props: Props) {
                 </label>
                 <Input type="number" name="amount" id="amount" placeholder="Amount" required />
               </fieldset>
-              <fieldset class="w-full">
-                <label
-                  for="
+              <Show when={transaction() === 'expense'}>
+                <fieldset class="w-full">
+                  <label
+                    for="
                 budget_cat_id
                 "
-                  class="mb-2 block text-sm font-semibold text-gray-900"
-                >
-                  Budget category
-                </label>
-                <Select id="budget_cat_id_" name="budget_cat_id_" required class="mt-1">
-                  <option value={''} selected>
-                    Choose an option
-                  </option>
+                    class="mb-2 block text-sm font-semibold text-gray-900"
+                  >
+                    Budget category
+                  </label>
+                  <Select id="budget_cat_id_" name="budget_cat_id_" required class="mt-1">
+                    <option value={''} selected>
+                      Choose an option
+                    </option>
 
-                  <For each={data()?.categories.data}>
-                    {(account) => <option value={account.id}>{account.name}</option>}
-                  </For>
-                </Select>
-              </fieldset>
+                    <For each={data()?.budget_categories.data}>
+                      {(account) => <option value={account.id}>{account.name}</option>}
+                    </For>
+                  </Select>
+                </fieldset>
+              </Show>
+              <Show when={transaction() === 'income'}>
+                <fieldset class="w-full">
+                  <label
+                    for="
+                income_cat_id
+                "
+                    class="mb-2 block text-sm font-semibold text-gray-900"
+                  >
+                    Income category
+                  </label>
+                  <Select id="income_category_id" name="income_category_id" required class="mt-1">
+                    <option value={''} selected>
+                      Choose an option
+                    </option>
+
+                    <For each={data()?.income_categories.data}>
+                      {(income_cat) => <option value={income_cat.id}>{income_cat.name}</option>}
+                    </For>
+                  </Select>
+                </fieldset>
+              </Show>
 
               <Show when={data.state === 'ready'}>
                 <fieldset class="w-full">
@@ -200,7 +267,7 @@ export function DrawerTransactionForm(props: Props) {
                 form="account-form"
                 type="submit"
                 // class="w-full rounded bg-black py-4 font-bold text-white  hover:bg-opacity-90"
-                disabled={true}
+                // disabled={true}
                 // disabled={enrolling.pending}
               >
                 Agregar

@@ -22,6 +22,7 @@ export function routeData({ params }: RouteDataArgs) {
         description: string;
         id: string;
         updated: string;
+        transaction_type: 'income' | 'expense';
         user_id: string;
         expand: {
           account_id: {
@@ -36,6 +37,16 @@ export function routeData({ params }: RouteDataArgs) {
             user_id: string;
             expand: {};
           };
+          income_category_id: {
+            collectionId: string;
+            collectionName: string;
+            created: string;
+            description: string;
+            id: string;
+            name: string;
+            updated: string;
+            expand: {};
+          };
           budget_cat_id_: {
             collectionId: string;
             collectionName: string;
@@ -48,9 +59,10 @@ export function routeData({ params }: RouteDataArgs) {
           };
         };
       }>(1, 50, {
-        expand: 'budget_cat_id_,account_id',
+        expand: 'budget_cat_id_,account_id,income_category_id',
       });
 
+      debugger;
       return resultList;
     },
     {
@@ -116,7 +128,7 @@ export default function Transactions() {
                     Amount
                   </th>
                   <th scope="col" class="px-6 py-3">
-                    Budget Category
+                    Category
                   </th>
                   <th scope="col" class="px-6 py-3">
                     Account
@@ -145,10 +157,26 @@ export default function Transactions() {
                         {item.date}
                       </th>
                       <th scope="row" class="whitespace-nowrap px-6 py-4 font-medium text-gray-900 ">
-                        {item.amount}
+                        {item.transaction_type === 'income' ? (
+                          <span class="text-green-500">
+                            {new Intl.NumberFormat('en-US', {
+                              style: 'currency',
+                              currency: 'USD',
+                            }).format(item.amount)}
+                          </span>
+                        ) : (
+                          <span class="text-red-500">
+                            {new Intl.NumberFormat('en-US', {
+                              style: 'currency',
+                              currency: 'USD',
+                            }).format(item.amount)}
+                          </span>
+                        )}
                       </th>
                       <th scope="row" class="whitespace-nowrap px-6 py-4 font-medium text-gray-900 ">
-                        {item.expand.budget_cat_id_.name}
+                        {item.transaction_type === 'income'
+                          ? item.expand.income_category_id.name
+                          : item.expand.budget_cat_id_.name}
                       </th>
                       <th scope="row" class="whitespace-nowrap px-6 py-4 font-medium text-gray-900 ">
                         {item.expand.account_id.name}
