@@ -145,12 +145,8 @@ export default function Budget() {
     if (location.query['m'] === '0' || new Date().getMonth() === 0) {
       return '/app/budgets?m=11&y=' + (Number(location.query['y']) - 1 || new Date().getFullYear() - 1);
     } else {
-      return (
-        '/app/budgets?m=' +
-        (Number(location.query['m']) - 1 || new Date().getMonth() - 1) +
-        '&y=' +
-        (location.query['y'] || new Date().getFullYear())
-      );
+      const month = location.query['m'] ? Number(location.query['m']) - 1 : new Date().getMonth() - 1;
+      return '/app/budgets?m=' + month + '&y=' + (location.query['y'] || new Date().getFullYear());
     }
   };
 
