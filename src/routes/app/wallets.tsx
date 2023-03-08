@@ -1,11 +1,12 @@
 import NavBar from '~/components/nav-bar';
 import { RiSystemAddFill } from 'solid-icons/ri';
-import { createSignal, For, Show } from 'solid-js';
+import { createSignal, For, Show, Suspense } from 'solid-js';
 import { DrawerAccountForm } from '~/components/drawer-account-form';
 import { createServerData$ } from 'solid-start/server';
 import { RouteDataArgs, useRouteData } from 'solid-start';
 import { initPocketBase } from '~/db';
 import { ListResult } from 'pocketbase';
+import { TbArrowRight, TbDots } from 'solid-icons/tb';
 
 interface Account {
   account_type_id: string;
@@ -18,13 +19,15 @@ interface Account {
   updated: string;
   user_id: string;
   expand: {
-    collectionId: string;
-    collectionName: string;
-    created: string;
-    id: string;
-    name: string;
-    updated: string;
-    expand: any;
+    account_type_id: {
+      collectionId: string;
+      collectionName: string;
+      created: string;
+      id: string;
+      name: string;
+      updated: string;
+      expand: any;
+    };
   };
 }
 
@@ -77,6 +80,7 @@ export default function Wallets() {
   const [isOpen, setIsOpen] = createSignal(false);
   const users = useRouteData<typeof routeData>();
 
+  console.log(users()?.items);
   return (
     <>
       <NavBar
@@ -101,73 +105,70 @@ export default function Wallets() {
         }
       />
       <div class="mb-20">
-        <Show when={users()?.totalItems === 0}>
-          <p class="text-gray-500">No accounts found</p>
-        </Show>
-        <Show when={users()?.totalItems !== 0}>
-          <div class="relative overflow-x-auto">
-            <table class="table-wrapper w-full text-left text-sm text-gray-500 ">
-              <thead class="border-b text-xs uppercase">
-                <tr>
-                  <th scope="col" class="p-4">
-                    <div class="flex items-center">
-                      <input
-                        id="checkbox-all-search"
-                        type="checkbox"
-                        class="h-5 w-5 cursor-pointer border-gray-300 bg-gray-100"
-                      />
-                      <label for="checkbox-all-search" class="sr-only">
-                        checkbox
-                      </label>
-                    </div>
-                  </th>
-                  <th scope="col" class="px-6 py-3">
-                    Name
-                  </th>
-                  <th scope="col" class="px-6 py-3">
-                    Balance
-                  </th>
-                  <th scope="col" class="px-6 py-3">
-                    Type
-                  </th>
-                  <th scope="col" class="px-6 py-3">
-                    Actions
-                  </th>
-                </tr>
-              </thead>
-              <tbody>
-                <For each={users()?.items}>
-                  {(item) => (
-                    <tr class="border-b hover:bg-gray-100 ">
-                      <td class="w-4 p-4">
-                        <div class="flex items-center">
-                          <input id="checkbox-table-search-3" type="checkbox" class="h-5 w-5 cursor-pointer" />
-                          <label for="checkbox-table-search-3" class="sr-only">
-                            checkbox
-                          </label>
-                        </div>
-                      </td>
-                      <th scope="row" class="whitespace-nowrap px-6 py-4 font-medium text-gray-900 ">
-                        {item.name}
-                      </th>
+        <Suspense fallback={<div>Loading...</div>}>
+          <Show when={users()?.totalItems === 0}>
+            <p class="text-gray-500">No accounts found</p>
+          </Show>
+          <Show when={users()?.totalItems !== 0}>
+            <div class="relative overflow-x-auto">
+              <table class="table-wrapper w-full text-left text-sm text-gray-500 ">
+                <thead class="border-b text-xs uppercase">
+                  <tr>
+                    <th scope="col" class="p-4">
+                      <div class="flex items-center">
+                        <input
+                          id="checkbox-all-search"
+                          type="checkbox"
+                          class="h-5 w-5 cursor-pointer border-gray-300 bg-gray-100"
+                        />
+                        <label for="checkbox-all-search" class="sr-only">
+                          checkbox
+                        </label>
+                      </div>
+                    </th>
+                    <th scope="col" class="px-6 py-3">
+                      Name
+                    </th>
+                    <th scope="col" class="px-6 py-3">
+                      Balance
+                    </th>
+                    <th scope="col" class="px-6 py-3">
+                      Type
+                    </th>
+                    <th scope="col" class="min-w-[1%] px-6 py-3 text-lg">
+                      <TbDots />
+                    </th>
+                  </tr>
+                </thead>
+                <tbody>
+                  <For each={users()?.items}>
+                    {(item) => (
+                      <tr class="border-b hover:bg-gray-100 ">
+                        <td class="w-4 p-4">
+                          <div class="flex items-center">
+                            <input id="checkbox-table-search-3" type="checkbox" class="h-5 w-5 cursor-pointer" />
+                            <label for="checkbox-table-search-3" class="sr-only">
+                              checkbox
+                            </label>
+                          </div>
+                        </td>
+                        <th scope="row" class="whitespace-nowrap px-6 py-4 font-medium text-gray-900 ">
+                          {item.name}
+                        </th>
 
-                      <td class="px-6 py-4">{item.current_balance}</td>
-                      <td class="px-6 py-4">{item.expand.name}</td>
-                      <td class="flex items-center space-x-3 px-6 py-4">
-                        <a href="#" class="font-medium text-blue-600 hover:underline dark:text-blue-500">
-                          Edit
-                        </a>
-                        <a href="#" class="font-medium text-red-600 hover:underline dark:text-red-500">
-                          Remove
-                        </a>
-                      </td>
-                    </tr>
-                  )}
-                </For>
-              </tbody>
-            </table>
-          </div>
-        </Show>
+                        <td class="px-6 py-4">{item.current_balance}</td>
+                        <td class="px-6 py-4">{item.expand.account_type_id.name}</td>
+                        <td class="w-[1%] space-x-3 px-6 py-4 text-lg">
+                          <TbArrowRight />
+                        </td>
+                      </tr>
+                    )}
+                  </For>
+                </tbody>
+              </table>
+            </div>
+          </Show>
+        </Suspense>
       </div>
 
       <Show when={isOpen()}>

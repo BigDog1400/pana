@@ -1,5 +1,6 @@
 import { Button } from 'solid-headless';
 import { RiSystemAddFill } from 'solid-icons/ri';
+import { TbDots } from 'solid-icons/tb';
 import { createSignal, For, Show, Suspense } from 'solid-js';
 import { ErrorBoundary, RouteDataArgs, useRouteData } from 'solid-start';
 import { createServerData$ } from 'solid-start/server';
@@ -134,8 +135,8 @@ export default function Transactions() {
                     <th scope="col" class="px-6 py-3">
                       Account
                     </th>
-                    <th scope="col" class="px-6 py-3">
-                      Actions
+                    <th scope="col" class="min-w-[1%] px-6 py-3 text-lg">
+                      <TbDots />
                     </th>
                   </tr>
                 </thead>
@@ -183,14 +184,7 @@ export default function Transactions() {
                           {item.expand.account_id.name}
                         </th>
 
-                        <td class="flex items-center space-x-3 px-6 py-4">
-                          <a href="#" class="font-medium text-blue-600 hover:underline dark:text-blue-500">
-                            Edit
-                          </a>
-                          <a href="#" class="font-medium text-red-600 hover:underline dark:text-red-500">
-                            Remove
-                          </a>
-                        </td>
+                        <td class="w-[1%] space-x-3 px-6 py-4 text-lg"></td>
                       </tr>
                     )}
                   </For>
@@ -199,104 +193,6 @@ export default function Transactions() {
             </div>
           </Show>
         </Suspense>
-        {/* <Suspense fallback={<div>Loading...</div>}>
-          <Show when={transactions()?.totalItems !== 0} fallback={<p class="text-gray-500">Not transactions found</p>}>
-            <div class="relative overflow-x-auto">
-              <table class="table-wrapper w-full text-left text-sm text-gray-500 ">
-                <thead class="border-b text-xs uppercase">
-                  <tr>
-                    <th scope="col" class="p-4">
-                      <div class="flex items-center">
-                        <input
-                          id="checkbox-all-search"
-                          type="checkbox"
-                          class="h-5 w-5 cursor-pointer border-gray-300 bg-gray-100"
-                        />
-                        <label for="checkbox-all-search" class="sr-only">
-                          checkbox
-                        </label>
-                      </div>
-                    </th>
-                    <th scope="col" class="px-6 py-3">
-                      Description
-                    </th>
-                    <th scope="col" class="px-6 py-3">
-                      Date
-                    </th>
-                    <th scope="col" class="px-6 py-3">
-                      Amount
-                    </th>
-                    <th scope="col" class="px-6 py-3">
-                      Category
-                    </th>
-                    <th scope="col" class="px-6 py-3">
-                      Account
-                    </th>
-                    <th scope="col" class="px-6 py-3">
-                      Actions
-                    </th>
-                  </tr>
-                </thead>
-                <tbody>
-                  <For each={transactions()?.items}>
-                    {(item) => (
-                      <tr class="border-b hover:bg-gray-100 ">
-                        <td class="w-4 p-4">
-                          <div class="flex items-center">
-                            <input id="checkbox-table-search-3" type="checkbox" class="h-5 w-5 cursor-pointer" />
-                            <label for="checkbox-table-search-3" class="sr-only">
-                              checkbox
-                            </label>
-                          </div>
-                        </td>
-                        <th scope="row" class="whitespace-nowrap px-6 py-4 font-medium text-gray-900 ">
-                          {item.description}
-                        </th>
-                        <th scope="row" class="whitespace-nowrap px-6 py-4 font-medium text-gray-900 ">
-                          {item.date}
-                        </th>
-                        <th scope="row" class="whitespace-nowrap px-6 py-4 font-medium text-gray-900 ">
-                          {item.transaction_type === 'income' ? (
-                            <span class="text-green-500">
-                              {new Intl.NumberFormat('en-US', {
-                                style: 'currency',
-                                currency: 'USD',
-                              }).format(item.amount)}
-                            </span>
-                          ) : (
-                            <span class="text-red-500">
-                              {new Intl.NumberFormat('en-US', {
-                                style: 'currency',
-                                currency: 'USD',
-                              }).format(item.amount)}
-                            </span>
-                          )}
-                        </th>
-                        <th scope="row" class="whitespace-nowrap px-6 py-4 font-medium text-gray-900 ">
-                          {item.transaction_type === 'income'
-                            ? item.expand.income_category_id.name
-                            : item.expand.budget_cat_id_.name}
-                        </th>
-                        <th scope="row" class="whitespace-nowrap px-6 py-4 font-medium text-gray-900 ">
-                          {item.expand.account_id.name}
-                        </th>
-
-                        <td class="flex items-center space-x-3 px-6 py-4">
-                          <a href="#" class="font-medium text-blue-600 hover:underline dark:text-blue-500">
-                            Edit
-                          </a>
-                          <a href="#" class="font-medium text-red-600 hover:underline dark:text-red-500">
-                            Remove
-                          </a>
-                        </td>
-                      </tr>
-                    )}
-                  </For>
-                </tbody>
-              </table>
-            </div>
-          </Show>
-        </Suspense> */}
       </div>
       <Show when={isOpen()}>
         <ErrorBoundary
