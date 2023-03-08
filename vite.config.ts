@@ -10,6 +10,9 @@ export default defineConfig({
   ssr: {
     noExternal: ['solid-headless', 'solid-heroicons'],
   },
+  build: {
+    outDir: '.output',
+  },
   plugins: [
     solid(),
     // devtools({
