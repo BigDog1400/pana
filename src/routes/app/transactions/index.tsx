@@ -156,9 +156,13 @@ export default function Transactions() {
                           {item.description}
                         </th>
                         <th scope="row" class="whitespace-nowrap px-6 py-4 font-medium text-gray-900 ">
-                          {item.date}
+                          {new Intl.DateTimeFormat('en-US', {
+                            year: 'numeric',
+                            month: 'long',
+                            day: '2-digit',
+                          }).format(new Date(item.date))}
                         </th>
-                        <th scope="row" class="whitespace-nowrap px-6 py-4 font-medium text-gray-900 ">
+                        <th scope="row" class="whitespace-nowrap px-6 py-4 font-semibold text-gray-900 ">
                           {item.transaction_type === 'income' ? (
                             <span class="text-green-500">
                               {new Intl.NumberFormat('en-US', {

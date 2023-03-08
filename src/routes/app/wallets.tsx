@@ -156,7 +156,14 @@ export default function Wallets() {
                           {item.name}
                         </th>
 
-                        <td class="px-6 py-4">{item.current_balance}</td>
+                        <td class="px-6 py-4 font-semibold">
+                          <span class={item.current_balance < 0 ? 'text-red-500' : 'text-green-500'}>
+                            {new Intl.NumberFormat('en-US', {
+                              style: 'currency',
+                              currency: 'USD',
+                            }).format(item.current_balance)}
+                          </span>
+                        </td>
                         <td class="px-6 py-4">{item.expand.account_type_id.name}</td>
                         <td class="w-[1%] space-x-3 px-6 py-4 text-lg">
                           <TbArrowRight />
