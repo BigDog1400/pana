@@ -25,6 +25,7 @@ export function LoginForm() {
     const email = form.get('email');
     const password = form.get('password');
     const redirectTo = form.get('redirectTo') || '/';
+
     if (
       typeof loginType !== 'string' ||
       typeof email !== 'string' ||
@@ -45,19 +46,31 @@ export function LoginForm() {
 
     switch (loginType) {
       case 'login': {
-        const user = await pb.collection('users').authWithPassword(email, password);
+        try {
+          const user = await pb.collection('users').authWithPassword(email, password);
 
-        if (!user) {
-          throw new FormError(`Username/Password combination is incorrect`, {
-            fields,
+          if (!user) {
+            throw new FormError(`Username/Password combination is incorrect`, {
+              fields,
+            });
+          }
+
+          return redirect(redirectTo, {
+            headers: {
+              'Set-Cookie': pb.authStore.exportToCookie(),
+            },
           });
+        } catch (error) {
+          if (error instanceof ClientResponseError) {
+            throw new FormError(error.data.message || `Username/Password combination is incorrect`, {
+              fields,
+            });
+          } else {
+            throw new FormError(`Something went wrong trying to log in.`, {
+              fields,
+            });
+          }
         }
-
-        return redirect(redirectTo, {
-          headers: {
-            'Set-Cookie': pb.authStore.exportToCookie(),
-          },
-        });
       }
       case 'register': {
         // Attempt to create a new user with the given email and password
@@ -103,11 +116,11 @@ export function LoginForm() {
     }
   });
   return (
-    <div class="flex justify-center h-screen w-screen items-center LoginForm">
-      <Form class="w-full md:w-[420px] flex flex-col items-center ">
+    <div class="LoginForm flex h-screen w-screen items-center justify-center">
+      <Form class="flex w-full flex-col items-center md:w-[420px] ">
         <input type="hidden" name="redirectTo" value="/" />
-        <div class="w-full mb-6">
-          <fieldset class={`flex flex-row justify-center items-center w-full gap-x-1 `}>
+        <div class="mb-6 w-full">
+          <fieldset class={`flex w-full flex-row items-center justify-center gap-x-1 `}>
             <input type="radio" id="login" name="loginType" class="hidden" value="login" checked />
             <label class="text-center text-2xl font-bold text-black " for="login">
               Login
@@ -119,32 +132,32 @@ export function LoginForm() {
           </fieldset>
         </div>
 
-        <div class="w-full mb-6">
+        <div class="mb-6 w-full">
           <input
             type="email"
             name="email"
             id="email"
-            class="w-full py-4 px-8 bg-slate-200 placeholder:font-semibold rounded hover:ring-1 outline-blue-500"
+            class="w-full rounded bg-slate-200 py-4 px-8 outline-blue-500 placeholder:font-semibold hover:ring-1"
             placeholder="Email"
             required
           />
         </div>
 
-        <div class="w-full mb-6">
+        <div class="mb-6 w-full">
           <input
             type="password"
             name="password"
             id="password"
-            class="w-full py-4 px-8 bg-slate-200 placeholder:font-semibold rounded hover:ring-1 outline-blue-500 "
+            class="w-full rounded bg-slate-200 py-4 px-8 outline-blue-500 placeholder:font-semibold hover:ring-1 "
             placeholder="Password"
             required
             min={6}
           />
         </div>
 
-        <div class="w-full flex flex-row justify-between">
+        <div class="flex w-full flex-row justify-between">
           <div class=" flex items-center gap-x-1">
-            <input type="checkbox" name="remember" id="" class=" w-4 h-4  " />
+            <input type="checkbox" name="remember" id="" class=" h-4 w-4  " />
             <label for="" class="text-sm text-slate-400">
               Remember me
             </label>
@@ -156,13 +169,13 @@ export function LoginForm() {
           </div>
         </div>
         <Show when={loggingIn.error}>
-          <p role="alert" class="text-red-500 text-sm font-semibold mt-2">
+          <p role="alert" class="mt-2 text-sm font-semibold text-red-500">
             {loggingIn.error.message}
           </p>
         </Show>
 
-        <div class="w-full mt-4">
-          <button type="submit" class="py-4 w-full rounded text-blue-50 font-bold bg-black  hover:bg-opacity-90">
+        <div class="mt-4 w-full">
+          <button type="submit" class="w-full rounded bg-black py-4 font-bold text-blue-50  hover:bg-opacity-90">
             {' '}
             Continuar
           </button>

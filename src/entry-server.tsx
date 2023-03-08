@@ -2,7 +2,7 @@ import { StartServer, createHandler, renderAsync } from 'solid-start/entry-serve
 import PocketBase from 'pocketbase';
 import { redirect } from 'solid-start';
 
-const authPaths = ['/login', '/register'];
+const protectedPathRegex = /^\/app\/.*/;
 
 export default createHandler(
   ({ forward }) => {
@@ -15,17 +15,7 @@ export default createHandler(
         pb.authStore.clear();
       }
 
-      if (authPaths.includes(new URL(event.request.url).pathname)) {
-        if (pb.authStore.isValid) {
-          return redirect('/', {
-            headers: {
-              'Set-Cookie': pb.authStore.exportToCookie(),
-            },
-          });
-        } else {
-          return forward(event);
-        }
-      } else {
+      if (protectedPathRegex.test(new URL(event.request.url).pathname)) {
         if (pb.authStore.isValid) {
           return forward(event);
         } else {
