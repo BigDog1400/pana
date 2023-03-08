@@ -63,7 +63,11 @@ export function DrawerTransactionForm(props: Props) {
         const record = await pb.collection('transactions').create({
           description: form.get('description'),
           date: form.get('date'),
-          amount: form.get('amount'),
+          // The amount should be negative if it's an expense
+          amount:
+            form.get('transaction_type') === 'expense'
+              ? -Math.abs(Number(form.get('amount')))
+              : Number(form.get('amount')),
           budget_cat_id_: form.get('budget_cat_id_'),
           account_id: form.get('account_id'),
           user_id: userId,

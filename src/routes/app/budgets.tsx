@@ -4,12 +4,14 @@ import { createSignal, For, Show, Suspense } from 'solid-js';
 import { createServerData$, json } from 'solid-start/server';
 import { A, RouteDataArgs, useLocation, useRouteData } from 'solid-start';
 import { initPocketBase } from '~/db';
-import { TbArrowLeft, TbDots, TbPlus } from 'solid-icons/tb';
+import { TbArrowLeft, TbDots } from 'solid-icons/tb';
 import { TbArrowRight } from 'solid-icons/tb';
 import { DrawerBudgetTargetForm } from '~/components/drawer-budget-target-form';
 import { Button } from '~/modules/ui/components/button';
 import { DrawerUpdateTargetBudgetForm } from '~/components/drawer-update-target-budget-form';
 import { DrawerBudgetCategoryTargetForm } from '~/components/drawer-budget-category-form';
+import { ClientResponseError } from 'pocketbase';
+import { DrawerBudgetForm } from '~/components/drawer-budget-form';
 export interface Root2 {
   collectionId: string;
   collectionName: string;
@@ -63,7 +65,7 @@ export function routeData({ location }: RouteDataArgs) {
       const date = new Date(
         Date.UTC(Number(year) || new Date().getFullYear(), month ? Number(month) : new Date().getMonth()),
       );
-      console.log(date);
+
       const result = date.toISOString().split('T')[0];
       const [year_, month_] = result.split('-');
 
@@ -82,14 +84,23 @@ export function routeData({ location }: RouteDataArgs) {
         resultList?.map(async (group) => {
           // Map over each budget category within the group
           const categories = group.expand['budget_categories(group_id)'] || [];
+
           const updatedCategories = await Promise.all(
             categories.map(async (category) => {
-              // Get the full list of budget targets for each category
               try {
-                const budget_target = await pb.collection('budget_targets').getFirstListItem<BudgetTarget>('', {
-                  filter: `budget_cat_id = "${category.id}" && date ~ "${year_}-${month_}"`,
-                  $autoCancel: false,
-                });
+                // Right now a user can create a transaction for a month that has no budget target
+                const budget_target = await pb
+                  .collection('budget_targets')
+                  .getFirstListItem<BudgetTarget>('', {
+                    filter: `budget_cat_id = "${category.id}" && date ~ "${year_}-${month_}"`,
+                    $autoCancel: false,
+                  })
+                  .catch((e) => {
+                    if (e instanceof ClientResponseError) {
+                      console.log(e.originalError);
+                    }
+                    return {} as BudgetTarget;
+                  });
 
                 const transactions = await pb.collection('transactions').getFullList<{
                   account_id: string;
@@ -122,17 +133,11 @@ export function routeData({ location }: RouteDataArgs) {
         }),
       );
 
-      // const expendAmount = await pb.collection('transactions').getFullList(200, {
-      //   filter: `budget_cat_id = "zo0e8nhva8vlr4i" && date ~ ${result}`,
-      //   // $autoCancel: false,
-      // });
-      // console.log({ expendAmount });
       return updatedResultList;
     },
     {
       key: () => ['budget_groups', location.query['m'], location.query['y']],
     },
-    // { key: () => ['students', params.id] },
   );
 }
 
@@ -167,28 +172,31 @@ export default function Budget() {
     <>
       <NavBar
         rightElement={
-          <div>
-            <A
-              // href={`/app/budgets?m=${Number(location.query['m']) - 1 || new Date().getMonth() - 1}&y=${
-              //   location.query['y'] || new Date().getFullYear()
-              // }`}
-              href={getPreviousDate()}
-              class="inline-flex min-h-[2.5rem] items-center justify-center gap-2 rounded-md border-2 border-black bg-transparent py-1 px-5 text-sm font-semibold text-black transition-all hover:bg-opacity-90"
-            >
-              <TbArrowLeft />
-            </A>
-            <span class="mx-2 font-semibold capitalize text-gray-500">
-              {new Date(
-                Number(location.query['y']) || new Date().getFullYear(),
-                location.query['m'] ? Number(location.query['m']) : new Date().getMonth(),
-              ).toLocaleString('default', { month: 'long', year: 'numeric' })}
-            </span>
-            <A
-              href={getNextDate()}
-              class="inline-flex min-h-[2.5rem] items-center justify-center gap-2 rounded-md border-2 border-black bg-transparent py-1 px-5 text-sm font-semibold text-black transition-all hover:bg-opacity-90"
-            >
-              <TbArrowRight />
-            </A>
+          <div class="flex gap-2">
+            <Button variant={'outline'} fw={'semibold'} onClick={() => setShowDrawer(true)}>
+              <RiSystemAddFill />
+              Add budget group
+            </Button>
+            <div>
+              <A
+                href={getPreviousDate()}
+                class="inline-flex min-h-[2.5rem] items-center justify-center gap-2 rounded-md border-2 border-black bg-transparent py-1 px-5 text-sm font-semibold text-black transition-all hover:bg-opacity-90"
+              >
+                <TbArrowLeft />
+              </A>
+              <span class="mx-2 font-semibold capitalize text-gray-500">
+                {new Date(
+                  Number(location.query['y']) || new Date().getFullYear(),
+                  location.query['m'] ? Number(location.query['m']) : new Date().getMonth(),
+                ).toLocaleString('default', { month: 'long', year: 'numeric' })}
+              </span>
+              <A
+                href={getNextDate()}
+                class="inline-flex min-h-[2.5rem] items-center justify-center gap-2 rounded-md border-2 border-black bg-transparent py-1 px-5 text-sm font-semibold text-black transition-all hover:bg-opacity-90"
+              >
+                <TbArrowRight />
+              </A>
+            </div>
           </div>
         }
       />
@@ -199,17 +207,19 @@ export default function Budget() {
           <For each={budgets()}>{(group) => <BudgetGroup group={group} />}</For>
         </Suspense>
       </div>
+      <DrawerBudgetForm isOpen={showDrawer()} onToggle={() => setShowDrawer((prev) => !prev)} />
     </>
   );
 }
 
-function BudgetGroup({ group }: { group: Root2 }) {
+function BudgetGroup(props: { group: Root2 }) {
   const [showDrawer, setShowDrawer] = createSignal(false);
+
   return (
     <>
       <div>
         <div class="flex items-center justify-between bg-gray-100 px-6 py-4">
-          <h3 class="text-4xl font-light capitalize">{group.name.toLowerCase()}</h3>
+          <h3 class="text-4xl font-light capitalize">{props.group.name.toLowerCase()}</h3>
           <Button variant={'outline'} fw="semibold" onClick={() => setShowDrawer(true)}>
             <RiSystemAddFill />
             Add new budget category
@@ -249,26 +259,22 @@ function BudgetGroup({ group }: { group: Root2 }) {
               </tr>
             </thead>
             <tbody>
-              <For each={group.expand['budget_categories(group_id)']}>{(item) => <BudgetCategory data={item} />}</For>
+              <For each={props.group.expand['budget_categories(group_id)']}>
+                {(item) => <BudgetCategory data={item} />}
+              </For>
             </tbody>
           </table>
         </div>
       </div>
       <DrawerBudgetCategoryTargetForm
         budgetGroup={{
-          id: group.id,
+          id: props.group.id,
         }}
         isOpen={showDrawer()}
         onToggle={() => {
           setShowDrawer(!showDrawer());
         }}
       />
-      {/* <DrawerBudgetForm
-        isOpen={showDrawer()}
-        onToggle={() => {
-          setShowDrawer(!showDrawer());
-        }}
-      /> */}
     </>
   );
 }
@@ -281,7 +287,7 @@ function BudgetCategory(props: { data: BudgetCategoriesGroupId }) {
       <tr
         class="cursor-pointer border-b hover:bg-gray-100"
         onClick={() => {
-          if (props.data.expand.budget_target) {
+          if (props.data.expand.budget_target?.id) {
             setShowUpdateModal(true);
           } else {
             setShowCreateModal(true);
@@ -290,7 +296,7 @@ function BudgetCategory(props: { data: BudgetCategoriesGroupId }) {
         tabIndex="0"
         onkeydown={(e) => {
           if (e.key === 'Enter') {
-            if (props.data.expand.budget_target) {
+            if (props.data.expand.budget_target?.id) {
               setShowUpdateModal(true);
             } else {
               setShowCreateModal(true);
@@ -344,7 +350,7 @@ function BudgetCategory(props: { data: BudgetCategoriesGroupId }) {
           <TbArrowRight />
         </td>
       </tr>
-      <Show when={!props?.data?.expand?.budget_target && showCreateModal()}>
+      <Show when={!props?.data?.expand?.budget_target?.id && showCreateModal()}>
         <DrawerBudgetTargetForm
           date={
             new Date(
@@ -365,7 +371,7 @@ function BudgetCategory(props: { data: BudgetCategoriesGroupId }) {
           }}
         />
       </Show>
-      <Show when={props?.data?.expand?.budget_target && showUpdateModal()}>
+      <Show when={props?.data?.expand?.budget_target?.id && showUpdateModal()}>
         <DrawerUpdateTargetBudgetForm
           initialValues={{
             amount: props.data.expand.budget_target?.budgeted_amount!,
