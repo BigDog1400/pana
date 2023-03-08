@@ -11,7 +11,7 @@ export function routeData() {
     const pb = new PocketBase(import.meta.env.VITE_POCKETBASE_URL);
     pb.authStore.loadFromCookie(request.headers.get('Cookie') || '');
     if (pb.authStore.isValid) {
-      return pb.authStore.model;
+      return redirect('/app/wallets');
     } else {
       throw redirect('/login');
     }
