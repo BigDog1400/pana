@@ -12,6 +12,8 @@ jobs:
     steps:
       - uses: actions/checkout@v2
       - uses: superfly/flyctl-actions/setup-flyctl@master
+      - name: Create .env file
+        run: echo "VITE_POCKETBASE_URL=${{ vars.VITE_POCKETBASE_URL }}" > .env
       - name: Run flyctl deploy
         env:
           VITE_POCKETBASE_URL: ${{ vars.VITE_POCKETBASE_URL }}
