@@ -263,7 +263,14 @@ export function DrawerTransactionForm(props: Props) {
         <Show when={!enrolling.result}>
           <DrawerFooter>
             <div class="flex justify-end gap-2">
-              <Button fw={'semibold'} variant={'secondary'} disabled>
+              <Button
+                fw={'semibold'}
+                variant={'secondary'}
+                disabled
+                onClick={() => {
+                  props.onToggle();
+                }}
+              >
                 Cancelar
               </Button>
               <Button

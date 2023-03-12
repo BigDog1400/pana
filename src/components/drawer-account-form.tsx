@@ -119,7 +119,13 @@ export function DrawerAccountForm(props: Props) {
         <Show when={!enrolling.result}>
           <DrawerFooter>
             <div class="flex justify-end gap-2">
-              <Button variant={'secondary'} fw="semibold">
+              <Button
+                variant={'secondary'}
+                fw="semibold"
+                onClick={() => {
+                  props.onToggle();
+                }}
+              >
                 Cancelar
               </Button>
               <Button form="account-form" type="submit" fw="semibold" disabled={enrolling.pending}>
