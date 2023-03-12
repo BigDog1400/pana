@@ -117,8 +117,6 @@ export function LoginForm() {
   });
   return (
     <div class="LoginForm flex h-screen w-screen items-center justify-center">
-      <span>{import.meta.env.VITE_POCKETBASE_URL}</span>
-
       <Form class="flex w-full flex-col items-center md:w-[420px] ">
         <input type="hidden" name="redirectTo" value="/" />
         <div class="mb-6 w-full">
