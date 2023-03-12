@@ -1,4 +1,4 @@
-name: DevCI
+name: DevDeployCI
 on:
   push:
     branches:
