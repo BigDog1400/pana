@@ -1,20 +1,7 @@
 // @refresh reload
 import { Suspense } from 'solid-js';
-import {
-  useLocation,
-  A,
-  Body,
-  ErrorBoundary,
-  FileRoutes,
-  Head,
-  Html,
-  Meta,
-  Routes,
-  Scripts,
-  Title,
-  useRouteData,
-} from 'solid-start';
-import PocketBase from 'pocketbase';
+import { useLocation, A, Body, ErrorBoundary, FileRoutes, Head, Html, Meta, Routes, Scripts, Title } from 'solid-start';
+import PocketBase, { ClientResponseError } from 'pocketbase';
 import { createServerData$, json } from 'solid-start/server';
 import './root.css';
 
@@ -49,7 +36,32 @@ export default function Root() {
       </Head>
       <Body class="bg-white">
         <Suspense>
-          <ErrorBoundary>
+          <ErrorBoundary
+            fallback={(e: Error) => (
+              <main class="flex h-screen w-full flex-col items-center justify-center">
+                <h1 class="text-5xl font-extrabold tracking-widest text-black">Oh no! An Error!</h1>
+                {e instanceof ClientResponseError ? (
+                  <>
+                    <div class="mt-2 rounded px-2 text-center text-sm">URL:&nbsp;{e.url}</div>
+                    <div class="mt-2 rounded px-2 text-center text-sm ">Status:&nbsp;{e.status}</div>
+                    <div class="mt-2 rounded px-2 text-center text-sm">Message:&nbsp;{e.message}</div>
+                  </>
+                ) : (
+                  <>
+                    {e.name ? <div class="mt-2 rounded px-2 text-sm">{e.name}</div> : null}
+                    {e.message ? <div class="mt-2 rounded px-2 text-sm">{e.message}</div> : null}
+                  </>
+                )}
+
+                <A
+                  href="/app/wallets"
+                  class="mt-2 inline-flex min-h-[2.5rem] items-center justify-center gap-2 rounded-md border-2 border-black bg-transparent py-1 px-5 text-sm font-semibold text-black transition-all hover:bg-opacity-90"
+                >
+                  <span>Go home</span>
+                </A>
+              </main>
+            )}
+          >
             <Routes>
               <FileRoutes />
             </Routes>

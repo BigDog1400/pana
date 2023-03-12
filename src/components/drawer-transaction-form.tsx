@@ -1,5 +1,5 @@
 import { createResource, createSignal, ErrorBoundary, For, Show } from 'solid-js';
-import { createServerAction$, createServerData$, json } from 'solid-start/server';
+import { createServerAction$, json } from 'solid-start/server';
 import {
   Drawer,
   DrawerBody,

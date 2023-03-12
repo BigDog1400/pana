@@ -1,7 +1,7 @@
 import NavBar from '~/components/nav-bar';
 import { RiSystemAddFill } from 'solid-icons/ri';
 import { createSignal, For, Show, Suspense } from 'solid-js';
-import { createServerData$, json } from 'solid-start/server';
+import { createServerData$ } from 'solid-start/server';
 import { A, RouteDataArgs, useLocation, useRouteData } from 'solid-start';
 import { initPocketBase } from '~/db';
 import { TbArrowLeft, TbDots } from 'solid-icons/tb';
