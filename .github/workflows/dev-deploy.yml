@@ -8,10 +8,11 @@ jobs:
     runs-on: ubuntu-latest
     env:
       FLY_API_TOKEN: ${{ secrets.FLY_API_TOKEN }}
+      VITE_POCKETBASE_URL: ${{ vars.VITE_POCKETBASE_URL }}
     steps:
       - uses: actions/checkout@v2
       - uses: superfly/flyctl-actions/setup-flyctl@master
       - name: Create .env file
-        run: echo "VITE_POCKETBASE_URL=${{ vars.VITE_POCKETBASE_URL }}" > .env
+        run: echo "VITE_POCKETBASE_URL=$VITE_POCKETBASE_URL" > .env
       - name: Run flyctl deploy
         run: 'flyctl deploy -c fly.dev.toml'
