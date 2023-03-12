@@ -4,7 +4,7 @@ import { FormError } from 'solid-start';
 import { createServerAction$, redirect } from 'solid-start/server';
 import { cookieSessionStorage } from '~/db/session';
 // import { createUserSession, login, register } from '~/db/session';
-import styles from './style.css';
+import './style.css';
 
 function validateUsername(email: unknown) {
   if (typeof email !== 'string') {
