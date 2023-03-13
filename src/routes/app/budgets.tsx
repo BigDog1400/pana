@@ -203,8 +203,21 @@ export default function Budget() {
       <div class="">
         {/* This works. It renders the budgets */}
 
-        <Suspense fallback={<div>Cargando...</div>}>
-          <For each={budgets()}>{(group) => <BudgetGroup group={group} />}</For>
+        <Suspense fallback={<div class="flex items-center justify-center">Loading...</div>}>
+          <Show
+            when={budgets() !== undefined && Array.isArray(budgets()) && budgets()?.length! > 0}
+            fallback={
+              <div class="text-center">
+                <h6 class="text-gray-500">No budgets found</h6>
+                <Button variant={'outline'} fw={'semibold'} onClick={() => setShowDrawer(true)} class="mt-4">
+                  <RiSystemAddFill />
+                  Add budget group
+                </Button>
+              </div>
+            }
+          >
+            <For each={budgets()}>{(group) => <BudgetGroup group={group} />}</For>
+          </Show>
         </Suspense>
       </div>
       <DrawerBudgetForm isOpen={showDrawer()} onToggle={() => setShowDrawer((prev) => !prev)} />

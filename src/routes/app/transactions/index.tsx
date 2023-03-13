@@ -1,4 +1,3 @@
-import { Button } from 'solid-headless';
 import { RiSystemAddFill } from 'solid-icons/ri';
 import { TbDots } from 'solid-icons/tb';
 import { createSignal, For, Show, Suspense } from 'solid-js';
@@ -7,6 +6,7 @@ import { createServerData$ } from 'solid-start/server';
 import { DrawerTransactionForm } from '~/components/drawer-transaction-form';
 import NavBar from '~/components/nav-bar';
 import { initPocketBase } from '~/db';
+import { Button } from '~/modules/ui/components/button';
 
 export function routeData({ params }: RouteDataArgs) {
   return createServerData$(
@@ -99,48 +99,66 @@ export default function Transactions() {
         }
       />
       <div class="mb-20">
-        <Suspense fallback={<div>Loading...</div>}>
-          <Show
-            when={transactions() !== undefined && transactions()?.totalItems !== 0}
-            fallback={<p class="text-gray-500">No transactions found</p>}
-          >
-            <div class="relative overflow-x-auto">
-              <table class="table-wrapper w-full text-left text-sm text-gray-500 ">
-                <thead class="border-b text-xs uppercase">
-                  <tr>
-                    <th scope="col" class="p-4">
-                      <div class="flex items-center">
-                        <input
-                          id="checkbox-all-search"
-                          type="checkbox"
-                          class="h-5 w-5 cursor-pointer border-gray-300 bg-gray-100"
-                        />
-                        <label for="checkbox-all-search" class="sr-only">
-                          checkbox
-                        </label>
-                      </div>
-                    </th>
-                    <th scope="col" class="px-6 py-3">
-                      Description
-                    </th>
-                    <th scope="col" class="px-6 py-3">
-                      Date
-                    </th>
-                    <th scope="col" class="px-6 py-3">
-                      Amount
-                    </th>
-                    <th scope="col" class="px-6 py-3">
-                      Category
-                    </th>
-                    <th scope="col" class="px-6 py-3">
-                      Account
-                    </th>
-                    <th scope="col" class="min-w-[1%] px-6 py-3 text-lg">
-                      <TbDots />
-                    </th>
+        <div class="relative overflow-x-auto">
+          <table class="table-wrapper w-full text-left text-sm text-gray-500 ">
+            <thead class="border-b text-xs uppercase">
+              <tr>
+                <th scope="col" class="p-4">
+                  <div class="flex items-center">
+                    <input
+                      id="checkbox-all-search"
+                      type="checkbox"
+                      class="h-5 w-5 cursor-pointer border-gray-300 bg-gray-100"
+                    />
+                    <label for="checkbox-all-search" class="sr-only">
+                      checkbox
+                    </label>
+                  </div>
+                </th>
+                <th scope="col" class="px-6 py-3">
+                  Description
+                </th>
+                <th scope="col" class="px-6 py-3">
+                  Date
+                </th>
+                <th scope="col" class="px-6 py-3">
+                  Amount
+                </th>
+                <th scope="col" class="px-6 py-3">
+                  Category
+                </th>
+                <th scope="col" class="px-6 py-3">
+                  Account
+                </th>
+                <th scope="col" class="min-w-[1%] px-6 py-3 text-lg">
+                  <TbDots />
+                </th>
+              </tr>
+            </thead>
+            <tbody>
+              <Suspense
+                fallback={
+                  <tr class="border-b hover:bg-gray-100 ">
+                    <td class="w-4 p-4 text-center" colSpan={99}>
+                      <h6>Loading...</h6>
+                    </td>
                   </tr>
-                </thead>
-                <tbody>
+                }
+              >
+                <Show
+                  when={transactions() !== undefined && transactions()?.totalItems !== 0}
+                  fallback={
+                    <tr class="border-b hover:bg-gray-100 ">
+                      <td class="w-4 p-4 text-center" colSpan={99}>
+                        <h6>No transactions found</h6>
+                        <Button variant={'outline'} class="mt-4" onClick={() => setIsOpen(true)} fw="semibold">
+                          <RiSystemAddFill class="font-semibold" />
+                          Add transaction
+                        </Button>
+                      </td>
+                    </tr>
+                  }
+                >
                   <For each={transactions()?.items}>
                     {(item) => (
                       <tr class="border-b hover:bg-gray-100 ">
@@ -192,11 +210,11 @@ export default function Transactions() {
                       </tr>
                     )}
                   </For>
-                </tbody>
-              </table>
-            </div>
-          </Show>
-        </Suspense>
+                </Show>
+              </Suspense>
+            </tbody>
+          </table>
+        </div>
       </div>
       <Show when={isOpen()}>
         <ErrorBoundary

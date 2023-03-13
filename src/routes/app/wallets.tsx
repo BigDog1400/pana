@@ -7,6 +7,7 @@ import { RouteDataArgs, useRouteData } from 'solid-start';
 import { initPocketBase } from '~/db';
 import { ListResult } from 'pocketbase';
 import { TbArrowRight, TbDots } from 'solid-icons/tb';
+import { Button } from '~/modules/ui/components/button';
 
 interface Account {
   account_type_id: string;
@@ -78,9 +79,9 @@ export function routeData({ params }: RouteDataArgs) {
 
 export default function Wallets() {
   const [isOpen, setIsOpen] = createSignal(false);
-  const users = useRouteData<typeof routeData>();
+  const accounts = useRouteData<typeof routeData>();
 
-  console.log(users()?.items);
+  console.log(accounts()?.items);
   return (
     <>
       <NavBar
@@ -105,43 +106,61 @@ export default function Wallets() {
         }
       />
       <div class="mb-20">
-        <Suspense fallback={<div>Loading...</div>}>
-          <Show when={users()?.totalItems === 0}>
-            <p class="text-gray-500">No accounts found</p>
-          </Show>
-          <Show when={users()?.totalItems !== 0}>
-            <div class="relative overflow-x-auto">
-              <table class="table-wrapper w-full text-left text-sm text-gray-500 ">
-                <thead class="border-b text-xs uppercase">
-                  <tr>
-                    <th scope="col" class="p-4">
-                      <div class="flex items-center">
-                        <input
-                          id="checkbox-all-search"
-                          type="checkbox"
-                          class="h-5 w-5 cursor-pointer border-gray-300 bg-gray-100"
-                        />
-                        <label for="checkbox-all-search" class="sr-only">
-                          checkbox
-                        </label>
-                      </div>
-                    </th>
-                    <th scope="col" class="px-6 py-3">
-                      Name
-                    </th>
-                    <th scope="col" class="px-6 py-3">
-                      Balance
-                    </th>
-                    <th scope="col" class="px-6 py-3">
-                      Type
-                    </th>
-                    <th scope="col" class="min-w-[1%] px-6 py-3 text-lg">
-                      <TbDots />
-                    </th>
+        <div class="relative overflow-x-auto">
+          <table class="table-wrapper w-full text-left text-sm text-gray-500 ">
+            <thead class="border-b text-xs uppercase">
+              <tr>
+                <th scope="col" class="p-4">
+                  <div class="flex items-center">
+                    <input
+                      id="checkbox-all-search"
+                      type="checkbox"
+                      class="h-5 w-5 cursor-pointer border-gray-300 bg-gray-100"
+                    />
+                    <label for="checkbox-all-search" class="sr-only">
+                      checkbox
+                    </label>
+                  </div>
+                </th>
+                <th scope="col" class="px-6 py-3">
+                  Name
+                </th>
+                <th scope="col" class="px-6 py-3">
+                  Balance
+                </th>
+                <th scope="col" class="px-6 py-3">
+                  Type
+                </th>
+                <th scope="col" class="min-w-[1%] px-6 py-3 text-lg">
+                  <TbDots />
+                </th>
+              </tr>
+            </thead>
+            <tbody>
+              <Suspense
+                fallback={
+                  <tr class="border-b hover:bg-gray-100 ">
+                    <td class="w-4 p-4 text-center" colSpan={99}>
+                      <h6>Loading...</h6>
+                    </td>
                   </tr>
-                </thead>
-                <tbody>
-                  <For each={users()?.items}>
+                }
+              >
+                <Show
+                  when={accounts() !== undefined && accounts()?.totalItems !== 0}
+                  fallback={
+                    <tr class="border-b hover:bg-gray-100 ">
+                      <td class="w-4 p-4 text-center" colSpan={99}>
+                        <h6>No account found</h6>
+                        <Button variant={'outline'} class="mt-4" onClick={() => setIsOpen(true)} fw="semibold">
+                          <RiSystemAddFill class="font-semibold" />
+                          Add account
+                        </Button>
+                      </td>
+                    </tr>
+                  }
+                >
+                  <For each={accounts()?.items}>
                     {(item) => (
                       <tr class="border-b hover:bg-gray-100 ">
                         <td class="w-4 p-4">
@@ -171,11 +190,11 @@ export default function Wallets() {
                       </tr>
                     )}
                   </For>
-                </tbody>
-              </table>
-            </div>
-          </Show>
-        </Suspense>
+                </Show>
+              </Suspense>
+            </tbody>
+          </table>
+        </div>
       </div>
 
       <Show when={isOpen()}>
