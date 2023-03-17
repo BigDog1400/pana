@@ -1,6 +1,6 @@
 import NavBar from '~/components/nav-bar';
 import { RiSystemAddFill } from 'solid-icons/ri';
-import { createSignal, For, Show, Suspense } from 'solid-js';
+import { createSignal, For, lazy, onMount, Show, Suspense } from 'solid-js';
 import { DrawerAccountForm } from '~/components/drawer-account-form';
 import { createServerData$ } from 'solid-start/server';
 import { RouteDataArgs, useRouteData } from 'solid-start';
@@ -8,6 +8,7 @@ import { initPocketBase } from '~/db';
 import { ListResult } from 'pocketbase';
 import { TbArrowRight, TbDots } from 'solid-icons/tb';
 import { Button } from '~/modules/ui/components/button';
+import { A, useSearchParams } from '@solidjs/router';
 
 interface Account {
   account_type_id: string;
@@ -81,13 +82,10 @@ export default function Wallets() {
   const [isOpen, setIsOpen] = createSignal(false);
   const accounts = useRouteData<typeof routeData>();
 
-  console.log(accounts()?.items);
   return (
     <>
       <NavBar
         rightElement={
-          // add wallet button
-
           <button
             class="inline-flex  h-10 items-center gap-2 rounded-[3px] border-2
             border-black
@@ -136,6 +134,7 @@ export default function Wallets() {
                 </th>
               </tr>
             </thead>
+
             <tbody>
               <Suspense
                 fallback={
@@ -146,21 +145,17 @@ export default function Wallets() {
                   </tr>
                 }
               >
-                <Show
-                  when={accounts() !== undefined && accounts()?.totalItems !== 0}
-                  fallback={
-                    <tr class="border-b hover:bg-gray-100 ">
-                      <td class="w-4 p-4 text-center" colSpan={99}>
-                        <h6>No account found</h6>
-                        <Button variant={'outline'} class="mt-4" onClick={() => setIsOpen(true)} fw="semibold">
-                          <RiSystemAddFill class="font-semibold" />
-                          Add account
-                        </Button>
-                      </td>
-                    </tr>
-                  }
-                >
-                  <For each={accounts()?.items}>
+                <Show when={accounts()}>
+                  <For
+                    each={accounts()?.items}
+                    fallback={
+                      <tr class="border-b hover:bg-gray-100 ">
+                        <td class="w-4 p-4 text-center" colSpan={99}>
+                          <h6>No account found</h6>
+                        </td>
+                      </tr>
+                    }
+                  >
                     {(item) => (
                       <tr class="border-b hover:bg-gray-100 ">
                         <td class="w-4 p-4">

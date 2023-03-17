@@ -52,7 +52,6 @@ export default function Root() {
                     {e.message ? <div class="mt-2 rounded px-2 text-sm">{e.message}</div> : null}
                   </>
                 )}
-
                 <A
                   href="/app/wallets"
                   class="mt-2 inline-flex min-h-[2.5rem] items-center justify-center gap-2 rounded-md border-2 border-black bg-transparent py-1 px-5 text-sm font-semibold text-black transition-all hover:bg-opacity-90"

@@ -1,4 +1,4 @@
-import { Show } from 'solid-js';
+import { createEffect, createResource, For, Show, Suspense } from 'solid-js';
 import { createServerAction$, json } from 'solid-start/server';
 import {
   Drawer,
@@ -20,6 +20,38 @@ interface Props {
   isOpen: boolean;
   onToggle: () => void;
 }
+interface AccountTypesResponse {
+  data: Array<{
+    collectionId: string;
+    collectionName: 'account_types';
+    created: string;
+    id: string;
+    name: string;
+    updated: string;
+    expand: {};
+  }>;
+}
+
+async function fetchData(
+  source: unknown,
+  {
+    value,
+    refetching,
+  }: {
+    value: unknown;
+    refetching: boolean | unknown;
+  },
+) {
+  const accountsTypesResponse = await fetch('/api/accounts-types');
+  const accountsTypes = await accountsTypesResponse.json();
+
+  if (!accountsTypesResponse.ok) {
+    console.log('Error fetching income accounts types', accountsTypes);
+    throw new Error(`An error occurred while fetching accounts types. ${accountsTypes?.error}`);
+  }
+
+  return { accountsTypes: accountsTypes as AccountTypesResponse };
+}
 
 export function DrawerAccountForm(props: Props) {
   const [enrolling, { Form }] = createServerAction$(
@@ -29,10 +61,37 @@ export function DrawerAccountForm(props: Props) {
 
       const record = await pb.collection('accounts').create({
         name: form.get('name') as string,
-        current_balance: form.get('current_balance') as string,
         account_type_id: form.get('account_type') as string,
         user_id: userId,
       });
+
+      // We need to get the ID of the INITIAL_BALANCE in income_categories
+      const initialBalanceTransactionType = await pb.collection('income_categories').getFirstListItem<{
+        collectionId: string;
+        collectionName: string;
+        created: string;
+        description: string;
+        id: string;
+        name: string;
+        updated: string;
+        expand: {};
+      }>("name='INITIAL_BALANCE'");
+      console.log({ initialBalanceTransactionType });
+
+      // current_balance: form.get('current_balance') as string,
+      // With the initial balance, we need to create a transaction
+      const initialBalance = form.get('current_balance') as string;
+      if (initialBalance) {
+        await pb.collection('transactions').create({
+          description: 'Initial balance',
+          date: new Date().toISOString(),
+          amount: initialBalance,
+          account_id: record.id,
+          user_id: userId,
+          transaction_type: 'income',
+          income_category_id: initialBalanceTransactionType.id,
+        });
+      }
 
       return json(
         { success: true, data: record },
@@ -47,6 +106,8 @@ export function DrawerAccountForm(props: Props) {
       invalidate: 'accounts',
     },
   );
+
+  const [data, { mutate, refetch }] = createResource(fetchData);
 
   return (
     <Drawer isOpen={props.isOpen} onToggle={props.onToggle} class="w-full max-w-xl">
@@ -101,16 +162,19 @@ export function DrawerAccountForm(props: Props) {
                   required
                 />
               </div>
-              <fieldset class="mb-6 w-full">
-                <label for="account_type" class="mb-2 block text-sm font-semibold text-gray-900">
-                  Account Type
-                </label>
-                <Select id="account_type" name="account_type">
-                  <option selected>Choose an option</option>
-                  <option value="bdhvh7pit9pkdi9">Savings</option>
-                  <option value="c5zxtv3kgz5yxbb">Checking</option>
-                </Select>
-              </fieldset>
+              <Suspense fallback={<div class="mb-6 w-full">Loading...</div>}>
+                <fieldset class="mb-6 w-full">
+                  <label for="account_type" class="mb-2 block text-sm font-semibold text-gray-900">
+                    Account Type
+                  </label>
+                  <Select id="account_type" name="account_type">
+                    <option selected>Choose an option</option>
+                    <For each={data()?.accountsTypes.data}>
+                      {(accountType) => <option value={accountType.id}>{accountType.name}</option>}
+                    </For>
+                  </Select>
+                </fieldset>
+              </Suspense>
               <div class="mb-6 w-full"></div>
             </Form>
           </Show>

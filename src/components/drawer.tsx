@@ -1,12 +1,9 @@
 import {
   // import {
   Dialog,
-  DialogPanel,
-  DialogTitle,
   Transition,
   TransitionChild,
   DialogOverlay,
-  DialogDescription,
 } from 'solid-headless';
 import type { JSX } from 'solid-js/jsx-runtime';
 type DrawerProps = {
