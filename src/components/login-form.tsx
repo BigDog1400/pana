@@ -25,7 +25,7 @@ export function LoginForm() {
     const loginType = form.get('loginType');
     const email = form.get('email');
     const password = form.get('password');
-    const redirectTo = form.get('redirectTo') || '/';
+    const redirectTo = form.get('redirectTo') || '/app/wallets';
 
     if (
       typeof loginType !== 'string' ||
@@ -128,7 +128,7 @@ export function LoginForm() {
   return (
     <div class="LoginForm flex h-screen w-screen items-center justify-center">
       <Form class="flex w-full flex-col items-center md:w-[420px] ">
-        <input type="hidden" name="redirectTo" value="/" />
+        <input type="hidden" name="redirectTo" value="/app/wallets" />
         <div class="mb-6 w-full">
           <fieldset class={`flex w-full flex-row items-center justify-center gap-x-1 `}>
             <input type="radio" id="login" name="loginType" class="hidden" value="login" checked />
