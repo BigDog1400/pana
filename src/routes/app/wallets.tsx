@@ -82,6 +82,14 @@ export default function Wallets() {
   const [isOpen, setIsOpen] = createSignal(false);
   const accounts = useRouteData<typeof routeData>();
 
+  onMount(() => {
+    const addAccountButton = document.getElementById('add-account');
+    if (addAccountButton) {
+      addAccountButton.addEventListener('click', () => {
+        setIsOpen(true);
+      });
+    }
+  });
   return (
     <>
       <NavBar
@@ -152,6 +160,10 @@ export default function Wallets() {
                       <tr class="border-b hover:bg-gray-100 ">
                         <td class="w-4 p-4 text-center" colSpan={99}>
                           <h6>No account found</h6>
+                          <Button variant={'outline'} class="mt-4" fw="semibold" id="add-account">
+                            <RiSystemAddFill class="font-semibold" />
+                            Add account
+                          </Button>
                         </td>
                       </tr>
                     }
