@@ -1,9 +1,6 @@
 import PocketBase from 'pocketbase';
-import { Show } from 'solid-js';
-import { A, useParams, useRouteData } from 'solid-start';
+import { useParams, useRouteData } from 'solid-start';
 import { createServerData$, redirect } from 'solid-start/server';
-
-import Counter from '~/components/Counter';
 import { LoginForm } from '~/components/login-form';
 
 export function routeData() {
@@ -11,7 +8,7 @@ export function routeData() {
     const pb = new PocketBase(import.meta.env.VITE_POCKETBASE_URL);
     pb.authStore.loadFromCookie(request.headers.get('Cookie') || '');
     if (pb.authStore.isValid) {
-      throw redirect('/');
+      throw redirect('/app/wallets');
     } else {
       return null;
     }
