@@ -4,7 +4,7 @@ import { FormError } from 'solid-start';
 import { createServerAction$, redirect } from 'solid-start/server';
 import { cookieSessionStorage } from '~/db/session';
 // import { createUserSession, login, register } from '~/db/session';
-import styles from './style.css';
+import './style.css';
 
 function validateUsername(email: unknown) {
   if (typeof email !== 'string') {
@@ -20,6 +20,7 @@ function validatePassword(password: unknown) {
 
 export function LoginForm() {
   const [loggingIn, { Form }] = createServerAction$(async (form: FormData) => {
+    console.log('PB URL: ', import.meta.env.VITE_POCKETBASE_URL);
     const pb = new PocketBase(import.meta.env.VITE_POCKETBASE_URL);
     const loginType = form.get('loginType');
     const email = form.get('email');
@@ -62,10 +63,14 @@ export function LoginForm() {
           });
         } catch (error) {
           if (error instanceof ClientResponseError) {
+            console.log('Invalid login, error instance of ClientResponseError');
+            console.log(error);
             throw new FormError(error.data.message || `Username/Password combination is incorrect`, {
               fields,
             });
           } else {
+            console.log('Invalid login, error not instance of ClientResponseError');
+            console.log(error);
             throw new FormError(`Something went wrong trying to log in.`, {
               fields,
             });
@@ -100,10 +105,14 @@ export function LoginForm() {
         } catch (error) {
           // If there was an error, throw an error
           if (error instanceof ClientResponseError) {
+            console.log('Invalid login, error instance of ClientResponseError');
+            console.log(error);
             throw new FormError(error.data.message || `Something went wrong trying to create a new user.`, {
               fields,
             });
           } else {
+            console.log('Invalid login, error not instance of ClientResponseError');
+            console.log(error);
             throw new FormError(`Something went wrong trying to create a new user.`, {
               fields,
             });
@@ -111,13 +120,13 @@ export function LoginForm() {
         }
       }
       default: {
+        console.log('Login type invalid');
         throw new FormError(`Login type invalid`, { fields });
       }
     }
   });
   return (
     <div class="LoginForm flex h-screen w-screen items-center justify-center">
-      <span>{import.meta.env.VITE_POCKETBASE_URL}</span>
       <Form class="flex w-full flex-col items-center md:w-[420px] ">
         <input type="hidden" name="redirectTo" value="/" />
         <div class="mb-6 w-full">

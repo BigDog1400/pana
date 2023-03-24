@@ -6,12 +6,13 @@ on:
 jobs:
   build:
     runs-on: ubuntu-latest
+    environment: Development
     env:
       FLY_API_TOKEN: ${{ secrets.FLY_API_TOKEN }}
     steps:
       - uses: actions/checkout@v2
       - uses: superfly/flyctl-actions/setup-flyctl@master
       - name: Create .env file
-        run: echo "VITE_POCKETBASE_URL=${{ vars.VITE_POCKETBASE_URL }}" > .env
+        run: echo "VITE_POCKETBASE_URL= ${{ secrets.VITE_POCKETBASE_URL }}" > .env
       - name: Run flyctl deploy
         run: 'flyctl deploy -c fly.dev.toml'

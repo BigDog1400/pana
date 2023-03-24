@@ -1,5 +1,5 @@
-import { createResource, createSignal, ErrorBoundary, For, Show } from 'solid-js';
-import { createServerAction$, createServerData$, json } from 'solid-start/server';
+import { createResource, createSignal, ErrorBoundary, For, Show, Suspense } from 'solid-js';
+import { createServerAction$, json } from 'solid-start/server';
 import {
   Drawer,
   DrawerBody,
@@ -40,12 +40,16 @@ async function fetchData(
   const income_categories = await incomeCategoriesResponse.json();
 
   if (!incomeCategoriesResponse.ok) {
+    console.log('Error fetching income categories', income_categories);
     throw new Error(`An error occurred while fetching income categories. ${income_categories?.error}`);
   }
   if (!accountsResponse.ok) {
+    console.log('Error fetching income categories', accounts);
+
     throw new Error(`An error occurred while fetching accounts. ${accounts?.error}`);
   }
   if (!categoriesResponse.ok) {
+    console.log('Error fetching income categories', budget_categories);
     throw new Error(`An error occurred while fetching categories. ${budget_categories?.error}`);
   }
 
@@ -197,50 +201,50 @@ export function DrawerTransactionForm(props: Props) {
                 </label>
                 <Input type="number" name="amount" id="amount" placeholder="Amount" required />
               </fieldset>
-              <Show when={transaction() === 'expense'}>
-                <fieldset class="w-full">
-                  <label
-                    for="
+              <Show when={data.state === 'ready'}>
+                <Show when={transaction() === 'expense'}>
+                  <fieldset class="w-full">
+                    <label
+                      for="
                 budget_cat_id
                 "
-                    class="mb-2 block text-sm font-semibold text-gray-900"
-                  >
-                    Budget category
-                  </label>
-                  <Select id="budget_cat_id_" name="budget_cat_id_" required class="mt-1">
-                    <option value={''} selected>
-                      Choose an option
-                    </option>
+                      class="mb-2 block text-sm font-semibold text-gray-900"
+                    >
+                      Budget category
+                    </label>
+                    <Select id="budget_cat_id_" name="budget_cat_id_" required class="mt-1">
+                      <option value={''} selected>
+                        Choose an option
+                      </option>
 
-                    <For each={data()?.budget_categories.data}>
-                      {(account) => <option value={account.id}>{account.name}</option>}
-                    </For>
-                  </Select>
-                </fieldset>
-              </Show>
-              <Show when={transaction() === 'income'}>
-                <fieldset class="w-full">
-                  <label
-                    for="
+                      <For each={data()?.budget_categories.data}>
+                        {(account) => <option value={account.id}>{account.name}</option>}
+                      </For>
+                    </Select>
+                  </fieldset>
+                </Show>
+                <Show when={transaction() === 'income'}>
+                  <fieldset class="w-full">
+                    <label
+                      for="
                 income_cat_id
                 "
-                    class="mb-2 block text-sm font-semibold text-gray-900"
-                  >
-                    Income category
-                  </label>
-                  <Select id="income_category_id" name="income_category_id" required class="mt-1">
-                    <option value={''} selected>
-                      Choose an option
-                    </option>
+                      class="mb-2 block text-sm font-semibold text-gray-900"
+                    >
+                      Income category
+                    </label>
+                    <Select id="income_category_id" name="income_category_id" required class="mt-1">
+                      <option value={''} selected>
+                        Choose an option
+                      </option>
 
-                    <For each={data()?.income_categories.data}>
-                      {(income_cat) => <option value={income_cat.id}>{income_cat.name}</option>}
-                    </For>
-                  </Select>
-                </fieldset>
-              </Show>
+                      <For each={data()?.income_categories.data}>
+                        {(income_cat) => <option value={income_cat.id}>{income_cat.name}</option>}
+                      </For>
+                    </Select>
+                  </fieldset>
+                </Show>
 
-              <Show when={data.state === 'ready'}>
                 <fieldset class="w-full">
                   <label for="account_id" class="mb-2 block text-sm font-semibold text-gray-900">
                     Account
@@ -263,7 +267,14 @@ export function DrawerTransactionForm(props: Props) {
         <Show when={!enrolling.result}>
           <DrawerFooter>
             <div class="flex justify-end gap-2">
-              <Button fw={'semibold'} variant={'secondary'} disabled>
+              <Button
+                fw={'semibold'}
+                variant={'secondary'}
+                disabled
+                onClick={() => {
+                  props.onToggle();
+                }}
+              >
                 Cancelar
               </Button>
               <Button
