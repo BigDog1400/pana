@@ -1,6 +1,6 @@
 import NavBar from '~/components/nav-bar';
 import { RiSystemAddFill } from 'solid-icons/ri';
-import { createSignal, For, lazy, onMount, Show, Suspense } from 'solid-js';
+import { createEffect, createSignal, For, lazy, onMount, Show, Suspense } from 'solid-js';
 import { DrawerAccountForm } from '~/components/drawer-account-form';
 import { createServerData$ } from 'solid-start/server';
 import { RouteDataArgs, useRouteData } from 'solid-start';
@@ -160,7 +160,13 @@ export default function Wallets() {
                       <tr class="border-b hover:bg-gray-100 ">
                         <td class="w-4 p-4 text-center" colSpan={99}>
                           <h6>No account found</h6>
-                          <Button variant={'outline'} class="mt-4" fw="semibold" id="add-account">
+                          <Button
+                            variant={'outline'}
+                            class="mt-4"
+                            fw="semibold"
+                            id="add-account"
+                            onclick={() => setIsOpen(true)}
+                          >
                             <RiSystemAddFill class="font-semibold" />
                             Add account
                           </Button>
