@@ -172,12 +172,12 @@ export default function Budget() {
     <>
       <NavBar
         rightElement={
-          <div class="flex gap-2">
+          <div class="flex flex-wrap gap-2">
             <Button variant={'outline'} fw={'semibold'} onClick={() => setShowDrawer(true)}>
               <RiSystemAddFill />
               Add budget group
             </Button>
-            <div>
+            <div class="hidden lg:block">
               <A
                 href={getPreviousDate()}
                 class="inline-flex min-h-[2.5rem] items-center justify-center gap-2 rounded-md border-2 border-black bg-transparent py-1 px-5 text-sm font-semibold text-black transition-all hover:bg-opacity-90"
@@ -201,7 +201,26 @@ export default function Budget() {
         }
       />
       <div class="">
-        {/* This works. It renders the budgets */}
+        <div class="flex flex-wrap items-center justify-end gap-2 px-2 pb-2 lg:hidden">
+          <A
+            href={getPreviousDate()}
+            class="inline-flex min-h-[2.5rem] items-center justify-center gap-2 rounded-md border-2 border-black bg-transparent py-1 px-5 text-sm font-semibold text-black transition-all hover:bg-opacity-90"
+          >
+            <TbArrowLeft />
+          </A>
+          <span class="mx-2 font-semibold capitalize text-gray-500">
+            {new Date(
+              Number(location.query['y']) || new Date().getFullYear(),
+              location.query['m'] ? Number(location.query['m']) : new Date().getMonth(),
+            ).toLocaleString('default', { month: 'long', year: 'numeric' })}
+          </span>
+          <A
+            href={getNextDate()}
+            class="inline-flex min-h-[2.5rem] items-center justify-center gap-2 rounded-md border-2 border-black bg-transparent py-1 px-5 text-sm font-semibold text-black transition-all hover:bg-opacity-90"
+          >
+            <TbArrowRight />
+          </A>
+        </div>
 
         <Suspense fallback={<div class="flex items-center justify-center">Loading...</div>}>
           <Show

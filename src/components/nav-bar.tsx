@@ -2,6 +2,7 @@ import { For, Show, lazy, createSignal } from 'solid-js';
 import { useMatch } from 'solid-start';
 import type { JSX } from 'solid-js/jsx-runtime';
 import { CgMenu } from 'solid-icons/cg';
+import { cx } from 'cva';
 
 const DynamicMobileMenu = lazy(() => import('./drawer-menu'));
 interface Props {
@@ -9,6 +10,7 @@ interface Props {
   leftElement?: JSX.Element;
   classLeftElementWrapper?: string;
   classRightElementWrapper?: string;
+  classNavBarWrapper?: string;
 }
 
 export default function NavBar(props: Props) {
@@ -58,12 +60,11 @@ export default function NavBar(props: Props) {
   return (
     <>
       <div class="z-40">
-        <div class="flex h-20 w-full items-center justify-between px-6">
+        <div class={cx('flex h-20 w-full items-center justify-between px-6', props.classNavBarWrapper)}>
           {/* <!-- left navbar --> */}
           <div class="flex">
             {/* <!-- mobile hamburger --> */}
             <div class="mr-4 flex items-center lg:hidden">
-              {/* @click="toggleSidebar() */}
               <button
                 class="navbar-burger hover:border-white hover:text-blue-500 focus:outline-none"
                 onClick={() => setIsOpen(!isOpen())}
@@ -94,11 +95,15 @@ export default function NavBar(props: Props) {
               </For>
             </div>
           </div>
-          <div class={props.classLeftElementWrapper}>{props.leftElement}</div>
+          <Show when={props.leftElement}>
+            <div class={props.classLeftElementWrapper}>{props.leftElement}</div>
+          </Show>
 
           {/* <!-- right navbar --> */}
           {/* add | html entity */}
-          <div class="">{props.rightElement}</div>
+          <Show when={props.rightElement}>
+            <div class={props.classRightElementWrapper}>{props.rightElement}</div>
+          </Show>
         </div>
       </div>
       <Show when={isOpen()}>
