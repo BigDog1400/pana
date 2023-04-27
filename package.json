@@ -23,6 +23,7 @@
     "clsx": "^1.2.1",
     "cva": "npm:class-variance-authority@^0.4.0",
     "pocketbase": "^0.9.1",
+    "shepherd.js": "^11.1.1",
     "solid-headless": "^0.13.0",
     "solid-icons": "^1.0.4",
     "solid-js": "^1.6.14",

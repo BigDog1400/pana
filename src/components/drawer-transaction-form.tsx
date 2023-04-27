@@ -61,7 +61,6 @@ export function DrawerTransactionForm(props: Props) {
     async (form: FormData, { request }) => {
       const pb = await initPocketBase(request);
       const userId = pb.authStore.model?.id;
-      debugger;
 
       try {
         const record = await pb.collection('transactions').create({
@@ -88,6 +87,7 @@ export function DrawerTransactionForm(props: Props) {
           },
         );
       } catch (error) {
+        console.log('Error creating transaction', error);
         return json(
           { success: false, error },
           {
@@ -145,8 +145,8 @@ export function DrawerTransactionForm(props: Props) {
               </div>
             }
           >
-            <Form class={'mt-6 grid gap-5'} id="account-form">
-              <div class="mb-6 w-full">
+            <Form class={'mt-6 grid gap-5'} id="transaction-form">
+              <div class="mb-6 w-full" id="transaction-type-select">
                 <fieldset
                   class={`flex w-full flex-row items-center justify-center gap-x-1`}
                   onchange={(e) => {
@@ -279,7 +279,7 @@ export function DrawerTransactionForm(props: Props) {
               </Button>
               <Button
                 fw={'semibold'}
-                form="account-form"
+                form="transaction-form"
                 type="submit"
                 // class="w-full rounded bg-black py-4 font-bold text-white  hover:bg-opacity-90"
                 // disabled={true}

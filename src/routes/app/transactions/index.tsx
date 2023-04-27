@@ -1,12 +1,25 @@
 import { RiSystemAddFill } from 'solid-icons/ri';
 import { TbDots } from 'solid-icons/tb';
-import { createSignal, For, Show, Suspense } from 'solid-js';
+import { createSignal, For, onMount, Show, Suspense } from 'solid-js';
 import { ErrorBoundary, RouteDataArgs, useRouteData } from 'solid-start';
 import { createServerData$ } from 'solid-start/server';
 import { DrawerTransactionForm } from '~/components/drawer-transaction-form';
 import NavBar from '~/components/nav-bar';
 import { initPocketBase } from '~/db';
 import { Button } from '~/modules/ui/components/button';
+import Shepherd from 'shepherd.js';
+import 'shepherd.js/dist/css/shepherd.css';
+
+const tour = new Shepherd.Tour({
+  useModalOverlay: true,
+  defaultStepOptions: {
+    cancelIcon: {
+      enabled: true,
+    },
+    classes: 'class-1 class-2',
+    scrollTo: { behavior: 'smooth', block: 'center' },
+  },
+});
 
 export function routeData({ params }: RouteDataArgs) {
   return createServerData$(
@@ -74,6 +87,63 @@ export function routeData({ params }: RouteDataArgs) {
 export default function Transactions() {
   const [isOpen, setIsOpen] = createSignal(false);
   const transactions = useRouteData<typeof routeData>();
+  onMount(() => {
+    tour.addStep({
+      title: 'Adding your first transaction',
+      text: `Click on the button above to add your first transaction.`,
+      attachTo: {
+        element: '#add-transaction-button',
+        on: 'bottom',
+      },
+      classes: '',
+      id: 'creating',
+    });
+
+    tour.addStep({
+      title: 'Adding your first transaction',
+      text: `Select the type of transaction you want to add. You can add an expense or an income.`,
+      cancelIcon: {
+        enabled: true,
+      },
+      attachTo: {
+        element: '#transaction-type-select',
+        on: 'bottom',
+      },
+      id: 'creating2',
+      buttons: [
+        {
+          action() {
+            return this.next();
+          },
+          text: 'Next',
+        },
+      ],
+    });
+
+    tour.addStep({
+      title: 'Adding your first transaction',
+      text: `Complete the form, you can add a description, the date, the amount, the category to which the transaction belongs and the account from which the transaction is made.`,
+      attachTo: {
+        element: '#transaction-form',
+        on: 'left',
+      },
+      id: 'creating3',
+      buttons: [
+        {
+          action() {
+            const form = document.getElementById('transaction-form');
+            if (form) {
+              (form as HTMLFormElement).requestSubmit();
+            }
+            return this.next();
+          },
+          text: 'Next',
+        },
+      ],
+    });
+
+    tour.start();
+  });
 
   return (
     <>
@@ -91,7 +161,13 @@ export default function Transactions() {
             text-black
             hover:bg-gray-100
             "
-            onClick={() => setIsOpen(true)}
+            onClick={() => {
+              setIsOpen(true);
+              setTimeout(() => {
+                tour.next();
+              }, 500);
+            }}
+            id="add-transaction-button"
           >
             <RiSystemAddFill />
             Add transaction

@@ -12,6 +12,7 @@ import { DrawerUpdateTargetBudgetForm } from '~/components/drawer-update-target-
 import { DrawerBudgetCategoryTargetForm } from '~/components/drawer-budget-category-form';
 import { ClientResponseError } from 'pocketbase';
 import { DrawerBudgetForm } from '~/components/drawer-budget-form';
+
 export interface Root2 {
   collectionId: string;
   collectionName: string;
@@ -252,7 +253,13 @@ function BudgetGroup(props: { group: Root2 }) {
       <div>
         <div class="flex items-center justify-between bg-gray-100 px-6 py-4">
           <h3 class="text-4xl font-light capitalize">{props.group.name.toLowerCase()}</h3>
-          <Button variant={'outline'} fw="semibold" onClick={() => setShowDrawer(true)}>
+          <Button
+            variant={'outline'}
+            fw="semibold"
+            onClick={() => {
+              setShowDrawer(true);
+            }}
+          >
             <RiSystemAddFill />
             Add new budget category
           </Button>

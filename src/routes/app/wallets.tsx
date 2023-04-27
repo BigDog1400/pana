@@ -8,8 +8,19 @@ import { initPocketBase } from '~/db';
 import { ListResult } from 'pocketbase';
 import { TbArrowRight, TbDots } from 'solid-icons/tb';
 import { Button } from '~/modules/ui/components/button';
-import { A, useSearchParams } from '@solidjs/router';
+import Shepherd from 'shepherd.js';
+import 'shepherd.js/dist/css/shepherd.css';
 
+const tour = new Shepherd.Tour({
+  useModalOverlay: true,
+  defaultStepOptions: {
+    cancelIcon: {
+      enabled: false,
+    },
+    classes: 'class-1 class-2',
+    scrollTo: { behavior: 'smooth', block: 'center' },
+  },
+});
 interface Account {
   account_type_id: string;
   collectionId: string;
@@ -83,6 +94,33 @@ export default function Wallets() {
   const accounts = useRouteData<typeof routeData>();
 
   onMount(() => {
+    tour.addStep({
+      title: 'Adding your first account',
+      text: `Add your first account to get started. You can add more accounts later.`,
+      attachTo: {
+        element: '#add-account-button',
+        on: 'bottom',
+      },
+      classes: '',
+      id: 'creating',
+    });
+
+    tour.addStep({
+      title: 'Adding your first account',
+      text: `Add a name for your account, select the type and the current balance.`,
+      cancelIcon: {
+        enabled: true,
+      },
+      attachTo: {
+        element: '#account-form',
+        on: 'bottom',
+      },
+      id: 'creating2',
+    });
+    tour.start();
+  });
+
+  onMount(() => {
     const addAccountButton = document.getElementById('add-account');
     if (addAccountButton) {
       addAccountButton.addEventListener('click', () => {
@@ -104,7 +142,13 @@ export default function Wallets() {
             text-black
             hover:bg-gray-100
             "
-            onClick={() => setIsOpen(true)}
+            onClick={() => {
+              setIsOpen(true);
+              setTimeout(() => {
+                tour.next();
+              }, 1000);
+            }}
+            id="add-account-button"
           >
             <RiSystemAddFill />
             Agregar Cartera
