@@ -98,6 +98,7 @@ export function routeData({ location }: RouteDataArgs) {
                   })
                   .catch((e) => {
                     if (e instanceof ClientResponseError) {
+                      console.log('ClientResponseError');
                       console.log(e.originalError);
                     }
                     return {} as BudgetTarget;

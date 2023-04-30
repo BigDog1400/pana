@@ -97,7 +97,7 @@ export function LoginForm() {
           await pb.collection('users').authWithPassword(email, password);
 
           // If the user was successfully created, redirect to the specified location and set the auth cookie
-          return redirect(redirectTo, {
+          return redirect('/api/setup', {
             headers: {
               'Set-Cookie': pb.authStore.exportToCookie(),
             },
