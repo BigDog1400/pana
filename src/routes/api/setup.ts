@@ -1,138 +1,141 @@
 import { ClientResponseError } from 'pocketbase';
 import { APIEvent, json, redirect } from 'solid-start/api';
 import { initPocketBase } from '~/db';
+import { BUDGET_CATEGORIES_TRANSLATIONS } from '~/utils/budget_categories_translations';
+import { BUDGET_GROUPS_TRANSLATIONS } from '~/utils/budget_groups_translations';
+
 const budget_groups = [
   {
     id: 1,
-    name: 'Housing',
+    name: 'HOUSING',
     categories: [
       {
         id: 1,
-        name: 'Rent/Mortgage',
+        name: 'RENT_MORTGAGE',
       },
       {
         id: 2,
-        name: 'Utilities (Electricity, Water, etc.)',
+        name: 'UTILITIES',
       },
       {
         id: 3,
-        name: 'Internet/Phone',
+        name: 'INTERNET_PHONE',
       },
       {
         id: 20,
-        name: 'Home Maintenance/Repairs',
+        name: 'HOME_MAINTENANCE_REPAIRS',
       },
     ],
   },
   {
     id: 2,
-    name: 'Transportation',
+    name: 'TRANSPORTATION',
     categories: [
       {
         id: 4,
-        name: 'Car Payment',
+        name: 'CAR_PAYMENT',
       },
       {
         id: 5,
-        name: 'Gas/Oil',
+        name: 'GAS_OIL',
       },
       {
         id: 6,
-        name: 'Maintenance/Repairs',
+        name: 'MAINTENANCE_REPAIRS',
       },
       {
         id: 7,
-        name: 'Public Transportation',
+        name: 'PUBLIC_TRANSPORTATION',
       },
     ],
   },
   {
     id: 3,
-    name: 'Food',
+    name: 'FOOD',
     categories: [
       {
         id: 8,
-        name: 'Groceries',
+        name: 'GROCERIES',
       },
       {
         id: 9,
-        name: 'Dining Out',
+        name: 'DINING_OUT',
       },
     ],
   },
   {
     id: 4,
-    name: 'Entertainment',
+    name: 'ENTERTAINMENT',
     categories: [
       {
         id: 10,
-        name: 'Movies',
+        name: 'MOVIES',
       },
       {
         id: 11,
-        name: 'Concerts/Shows',
+        name: 'CONCERTS_SHOWS',
       },
       {
         id: 12,
-        name: 'Books/Magazines',
+        name: 'GAMING',
       },
     ],
   },
   {
     id: 5,
-    name: 'Personal Care',
+    name: 'PERSONAL_CARE',
     categories: [
       {
         id: 13,
-        name: 'Haircuts/Styling',
+        name: 'HAIRCUTS_STYLING',
       },
       {
         id: 14,
-        name: 'Cosmetics/Toiletries',
+        name: 'COSMETICS_TOILETRIES',
       },
       {
         id: 21,
-        name: 'Clothing',
+        name: 'CLOTHING',
       },
       {
         id: 22,
-        name: 'Gym',
+        name: 'GYM',
       },
     ],
   },
   {
     id: 6,
-    name: 'Debt Payments',
+    name: 'DEBT_PAYMENTS',
     categories: [
       {
         id: 15,
-        name: 'Credit Cards',
+        name: 'CREDIT_CARDS',
       },
       {
         id: 16,
-        name: 'Loans',
+        name: 'LOANS',
       },
     ],
   },
   {
     id: 7,
-    name: 'Savings',
+    name: 'SAVINGS',
     categories: [
       {
         id: 17,
-        name: 'Emergency Fund',
+        name: 'EMERGENCY_FUND',
       },
       {
         id: 18,
-        name: 'Retirement',
+        name: 'RETIREMENT',
       },
       {
         id: 19,
-        name: 'College Fund',
+        name: 'COLLEGE_FUND',
       },
       {
         id: 23,
-        name: 'Travel savings',
+        name: 'TRAVEL_SAVINGS',
       },
     ],
   },

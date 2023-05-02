@@ -12,6 +12,8 @@ import { DrawerUpdateTargetBudgetForm } from '~/components/drawer-update-target-
 import { DrawerBudgetCategoryTargetForm } from '~/components/drawer-budget-category-form';
 import { ClientResponseError } from 'pocketbase';
 import { DrawerBudgetForm } from '~/components/drawer-budget-form';
+import { BUDGET_GROUPS_TRANSLATIONS } from '~/utils/budget_groups_translations';
+import { BUDGET_CATEGORIES_TRANSLATIONS } from '~/utils/budget_categories_translations';
 
 export interface Root2 {
   collectionId: string;
@@ -253,7 +255,10 @@ function BudgetGroup(props: { group: Root2 }) {
     <>
       <div>
         <div class="flex items-center justify-between bg-gray-100 px-6 py-4">
-          <h3 class="text-4xl font-light capitalize">{props.group.name.toLowerCase()}</h3>
+          <h3 class="text-4xl font-light capitalize">
+            {BUDGET_GROUPS_TRANSLATIONS?.[props.group.name as keyof typeof BUDGET_GROUPS_TRANSLATIONS] ||
+              props.group.name.toLowerCase()}
+          </h3>
           <Button
             variant={'outline'}
             fw="semibold"
@@ -359,7 +364,10 @@ function BudgetCategory(props: { data: BudgetCategoriesGroupId }) {
         </td>
 
         <th scope="row" class="col-type-text px-6 py-4 font-medium text-gray-900">
-          <span class="txt-ellipsis">{props.data?.name}</span>
+          <span class="txt-ellipsis">
+            {BUDGET_CATEGORIES_TRANSLATIONS[props.data?.name as keyof typeof BUDGET_CATEGORIES_TRANSLATIONS] ||
+              props.data?.name}
+          </span>
         </th>
         <th scope="row" class="col-type-text whitespace-nowrap px-6 py-4 font-medium text-gray-900">
           <span class="txt-ellipsis">
