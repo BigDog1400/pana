@@ -10,6 +10,7 @@ import { TbArrowRight, TbDots } from 'solid-icons/tb';
 import { Button } from '~/modules/ui/components/button';
 import Shepherd from 'shepherd.js';
 import 'shepherd.js/dist/css/shepherd.css';
+import { checkLocalStorageForTourDisplay, setLocalStorageForTourCompleted } from '~/utils/localstorage-tour';
 
 const tour = new Shepherd.Tour({
   useModalOverlay: true,
@@ -94,6 +95,7 @@ export default function Wallets() {
   const accounts = useRouteData<typeof routeData>();
 
   onMount(() => {
+    if (checkLocalStorageForTourDisplay('account-tour-completed')) return;
     tour.addStep({
       title: 'Adding your first account',
       text: `Add your first account to get started. You can add more accounts later.`,
@@ -103,11 +105,15 @@ export default function Wallets() {
       },
       classes: '',
       id: 'creating',
+      on(event, handler) {
+        alert(event);
+      },
     });
 
     tour.addStep({
       title: 'Adding your first account',
       text: `Add a name for your account, select the type and the current balance.`,
+      modalOverlayOpeningPadding: 5,
       cancelIcon: {
         enabled: true,
       },
@@ -116,6 +122,26 @@ export default function Wallets() {
         on: 'bottom',
       },
       id: 'creating2',
+      buttons: [
+        {
+          action() {
+            const form = document.getElementById('account-form');
+            if (form) {
+              (form as HTMLFormElement).requestSubmit();
+            }
+            return this.next();
+          },
+          text: 'Add account',
+        },
+      ],
+      when: {
+        hide() {
+          setLocalStorageForTourCompleted('account-tour-completed');
+        },
+        cancel() {
+          setLocalStorageForTourCompleted('account-tour-completed');
+        },
+      },
     });
     tour.start();
   });

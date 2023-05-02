@@ -9,6 +9,7 @@ import { initPocketBase } from '~/db';
 import { Button } from '~/modules/ui/components/button';
 import Shepherd from 'shepherd.js';
 import 'shepherd.js/dist/css/shepherd.css';
+import { checkLocalStorageForTourDisplay, setLocalStorageForTourCompleted } from '~/utils/localstorage-tour';
 
 const tour = new Shepherd.Tour({
   useModalOverlay: true,
@@ -18,6 +19,14 @@ const tour = new Shepherd.Tour({
     },
     classes: 'class-1 class-2',
     scrollTo: { behavior: 'smooth', block: 'center' },
+    when: {
+      hide() {
+        setLocalStorageForTourCompleted('transaction-tour-completed');
+      },
+      cancel() {
+        setLocalStorageForTourCompleted('transaction-tour-completed');
+      },
+    },
   },
 });
 
@@ -88,6 +97,8 @@ export default function Transactions() {
   const [isOpen, setIsOpen] = createSignal(false);
   const transactions = useRouteData<typeof routeData>();
   onMount(() => {
+    if (checkLocalStorageForTourDisplay('transaction-tour-completed')) return;
+
     tour.addStep({
       title: 'Adding your first transaction',
       text: `Click on the button above to add your first transaction.`,
@@ -127,6 +138,8 @@ export default function Transactions() {
         element: '#transaction-form',
         on: 'left',
       },
+      modalOverlayOpeningPadding: 5,
+
       id: 'creating3',
       buttons: [
         {
