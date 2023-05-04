@@ -15,6 +15,7 @@ import { AiFillCheckCircle } from 'solid-icons/ai';
 import { RouteDataArgs, useRouteData } from 'solid-start';
 import { Input, Select } from '~/modules/ui/components/form';
 import { Button } from '~/modules/ui/components/button';
+import { BUDGET_CATEGORIES_TRANSLATIONS } from '~/utils/budget_categories_translations';
 
 interface Props {
   className?: string;
@@ -218,7 +219,13 @@ export function DrawerTransactionForm(props: Props) {
                       </option>
 
                       <For each={data()?.budget_categories.data}>
-                        {(account) => <option value={account.id}>{account.name}</option>}
+                        {(account) => (
+                          <option value={account.id}>
+                            {BUDGET_CATEGORIES_TRANSLATIONS[
+                              account.name as keyof typeof BUDGET_CATEGORIES_TRANSLATIONS
+                            ] || account.name}
+                          </option>
+                        )}
                       </For>
                     </Select>
                   </fieldset>

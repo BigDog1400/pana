@@ -10,6 +10,7 @@ import { Button } from '~/modules/ui/components/button';
 import Shepherd from 'shepherd.js';
 import 'shepherd.js/dist/css/shepherd.css';
 import { checkLocalStorageForTourDisplay, setLocalStorageForTourCompleted } from '~/utils/localstorage-tour';
+import { BUDGET_CATEGORIES_TRANSLATIONS } from '~/utils/budget_categories_translations';
 
 const tour = new Shepherd.Tour({
   useModalOverlay: true,
@@ -289,7 +290,9 @@ export default function Transactions() {
                         <th scope="row" class="whitespace-nowrap px-6 py-4 font-medium text-gray-900 ">
                           {item.transaction_type === 'income'
                             ? item.expand?.income_category_id?.name
-                            : item.expand.budget_cat_id_.name}
+                            : BUDGET_CATEGORIES_TRANSLATIONS[
+                                item.expand.budget_cat_id_.name as keyof typeof BUDGET_CATEGORIES_TRANSLATIONS
+                              ] || item.expand.budget_cat_id_.name}
                         </th>
                         <th scope="row" class="whitespace-nowrap px-6 py-4 font-medium text-gray-900 ">
                           {item.expand.account_id.name}
