@@ -254,8 +254,8 @@ function BudgetGroup(props: { group: Root2 }) {
   return (
     <>
       <div>
-        <div class="flex items-center justify-between bg-gray-100 px-6 py-4">
-          <h3 class="text-4xl font-light capitalize">
+        <div class="flex items-center justify-between bg-gray-100 py-4 pl-6 pr-4">
+          <h3 class="text-2xl font-light capitalize md:text-4xl">
             {BUDGET_GROUPS_TRANSLATIONS?.[props.group.name as keyof typeof BUDGET_GROUPS_TRANSLATIONS] ||
               props.group.name.toLowerCase()}
           </h3>
@@ -265,9 +265,10 @@ function BudgetGroup(props: { group: Root2 }) {
             onClick={() => {
               setShowDrawer(true);
             }}
+            class="min-w-max"
           >
             <RiSystemAddFill />
-            Add new budget category
+            Add category
           </Button>
         </div>
         <div class="relative overflow-x-auto">
