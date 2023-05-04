@@ -16,6 +16,7 @@ import { RouteDataArgs, useRouteData } from 'solid-start';
 import { Input, Select } from '~/modules/ui/components/form';
 import { Button } from '~/modules/ui/components/button';
 import { BUDGET_CATEGORIES_TRANSLATIONS } from '~/utils/budget_categories_translations';
+import { INCOME_CATEGORIES_TRANSLATIONS } from '~/utils/income_categories_translations';
 
 interface Props {
   className?: string;
@@ -246,7 +247,13 @@ export function DrawerTransactionForm(props: Props) {
                       </option>
 
                       <For each={data()?.income_categories.data}>
-                        {(income_cat) => <option value={income_cat.id}>{income_cat.name}</option>}
+                        {(income_cat) => (
+                          <option value={income_cat.id}>
+                            {INCOME_CATEGORIES_TRANSLATIONS[
+                              income_cat.name as keyof typeof INCOME_CATEGORIES_TRANSLATIONS
+                            ] || income_cat.name}
+                          </option>
+                        )}
                       </For>
                     </Select>
                   </fieldset>
