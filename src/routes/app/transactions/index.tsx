@@ -234,21 +234,21 @@ export default function Transactions() {
                   </tr>
                 }
               >
-                <Show
-                  when={transactions() !== undefined && transactions()?.totalItems !== 0}
-                  fallback={
-                    <tr class="border-b hover:bg-gray-100 ">
-                      <td class="w-4 p-4 text-center" colSpan={99}>
-                        <h6>No transactions found</h6>
-                        <Button variant={'outline'} class="mt-4" onClick={() => setIsOpen(true)} fw="semibold">
-                          <RiSystemAddFill class="font-semibold" />
-                          Add transaction
-                        </Button>
-                      </td>
-                    </tr>
-                  }
-                >
-                  <For each={transactions()?.items}>
+                <Show when={transactions()}>
+                  <For
+                    each={transactions()?.items}
+                    fallback={
+                      <tr class="border-b hover:bg-gray-100 ">
+                        <td class="w-4 p-4 text-center" colSpan={99}>
+                          <h6>No transactions found</h6>
+                          <Button variant={'outline'} class="mt-4" onClick={() => setIsOpen(true)} fw="semibold">
+                            <RiSystemAddFill class="font-semibold" />
+                            Add transaction
+                          </Button>
+                        </td>
+                      </tr>
+                    }
+                  >
                     {(item) => (
                       <tr class="border-b hover:bg-gray-100 ">
                         <td class="w-4 p-4">
