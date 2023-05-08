@@ -1,3 +1,4 @@
+import { cx } from 'cva';
 import {
   // import {
   Dialog,
@@ -39,7 +40,7 @@ function DrawerOverlay() {
   );
 }
 
-function DrawerContent(props: { children: JSX.Element }) {
+function DrawerContent(props: { children: JSX.Element; class?: string }) {
   return (
     <TransitionChild
       enter="transition ease-in-out duration-300 transform"
@@ -50,7 +51,10 @@ function DrawerContent(props: { children: JSX.Element }) {
       leaveTo="translate-x-full"
     >
       <div
-        class={`relative z-[100] flex h-screen w-full flex-col  justify-between overflow-hidden bg-white p-6 text-left align-middle shadow-xl `}
+        class={cx(
+          `relative z-[100] flex h-screen w-full flex-col  justify-between overflow-hidden bg-white p-6 text-left align-middle shadow-xl`,
+          props.class,
+        )}
       >
         {props.children}
       </div>
@@ -58,8 +62,8 @@ function DrawerContent(props: { children: JSX.Element }) {
   );
 }
 
-function DrawerHeader(props: { children: JSX.Element }) {
-  return <div>{props.children}</div>;
+function DrawerHeader(props: { children: JSX.Element; class?: string }) {
+  return <div class={props.class}>{props.children}</div>;
 }
 
 function DrawerTitle(props: { children: JSX.Element }) {

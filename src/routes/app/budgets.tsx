@@ -12,6 +12,10 @@ import { DrawerUpdateTargetBudgetForm } from '~/components/drawer-update-target-
 import { DrawerBudgetCategoryTargetForm } from '~/components/drawer-budget-category-form';
 import { ClientResponseError } from 'pocketbase';
 import { DrawerBudgetForm } from '~/components/drawer-budget-form';
+import { BUDGET_GROUPS_TRANSLATIONS } from '~/utils/budget_groups_translations';
+import { BUDGET_CATEGORIES_TRANSLATIONS } from '~/utils/budget_categories_translations';
+import { drawerBudgetFormIsOpen } from '~/global-signals/drawer-budget-form-is-open';
+
 export interface Root2 {
   collectionId: string;
   collectionName: string;
@@ -97,6 +101,7 @@ export function routeData({ location }: RouteDataArgs) {
                   })
                   .catch((e) => {
                     if (e instanceof ClientResponseError) {
+                      console.log('ClientResponseError');
                       console.log(e.originalError);
                     }
                     return {} as BudgetTarget;
@@ -143,7 +148,7 @@ export function routeData({ location }: RouteDataArgs) {
 
 export default function Budget() {
   const budgets = useRouteData<typeof routeData>();
-  const [showDrawer, setShowDrawer] = createSignal(false);
+  const [showDrawer, setShowDrawer] = drawerBudgetFormIsOpen;
   const location = useLocation();
 
   const getPreviousDate = () => {
@@ -170,14 +175,14 @@ export default function Budget() {
 
   return (
     <>
-      <NavBar
+      {/* <NavBar
         rightElement={
-          <div class="flex gap-2">
+          <div class="flex flex-wrap gap-2">
             <Button variant={'outline'} fw={'semibold'} onClick={() => setShowDrawer(true)}>
               <RiSystemAddFill />
               Add budget group
             </Button>
-            <div>
+            <div class="hidden lg:block">
               <A
                 href={getPreviousDate()}
                 class="inline-flex min-h-[2.5rem] items-center justify-center gap-2 rounded-md border-2 border-black bg-transparent py-1 px-5 text-sm font-semibold text-black transition-all hover:bg-opacity-90"
@@ -199,9 +204,28 @@ export default function Budget() {
             </div>
           </div>
         }
-      />
-      <div class="">
-        {/* This works. It renders the budgets */}
+      /> */}
+      <div class="mt-2">
+        <div class="flex flex-wrap items-center justify-end gap-2 px-2 pb-2 lg:hidden">
+          <A
+            href={getPreviousDate()}
+            class="inline-flex min-h-[2.5rem] items-center justify-center gap-2 rounded-md border-2 border-black bg-transparent py-1 px-5 text-sm font-semibold text-black transition-all hover:bg-opacity-90"
+          >
+            <TbArrowLeft />
+          </A>
+          <span class="mx-2 font-semibold capitalize text-gray-500">
+            {new Date(
+              Number(location.query['y']) || new Date().getFullYear(),
+              location.query['m'] ? Number(location.query['m']) : new Date().getMonth(),
+            ).toLocaleString('default', { month: 'long', year: 'numeric' })}
+          </span>
+          <A
+            href={getNextDate()}
+            class="inline-flex min-h-[2.5rem] items-center justify-center gap-2 rounded-md border-2 border-black bg-transparent py-1 px-5 text-sm font-semibold text-black transition-all hover:bg-opacity-90"
+          >
+            <TbArrowRight />
+          </A>
+        </div>
 
         <Suspense fallback={<div class="flex items-center justify-center">Loading...</div>}>
           <Show
@@ -231,11 +255,21 @@ function BudgetGroup(props: { group: Root2 }) {
   return (
     <>
       <div>
-        <div class="flex items-center justify-between bg-gray-100 px-6 py-4">
-          <h3 class="text-4xl font-light capitalize">{props.group.name.toLowerCase()}</h3>
-          <Button variant={'outline'} fw="semibold" onClick={() => setShowDrawer(true)}>
+        <div class="flex items-center justify-between bg-gray-100 py-4 pl-6 pr-4">
+          <h3 class="text-2xl font-light capitalize md:text-4xl">
+            {BUDGET_GROUPS_TRANSLATIONS?.[props.group.name as keyof typeof BUDGET_GROUPS_TRANSLATIONS] ||
+              props.group.name.toLowerCase()}
+          </h3>
+          <Button
+            variant={'outline'}
+            fw="semibold"
+            onClick={() => {
+              setShowDrawer(true);
+            }}
+            class="min-w-max"
+          >
             <RiSystemAddFill />
-            Add new budget category
+            Add category
           </Button>
         </div>
         <div class="relative overflow-x-auto">
@@ -332,7 +366,10 @@ function BudgetCategory(props: { data: BudgetCategoriesGroupId }) {
         </td>
 
         <th scope="row" class="col-type-text px-6 py-4 font-medium text-gray-900">
-          <span class="txt-ellipsis">{props.data?.name}</span>
+          <span class="txt-ellipsis">
+            {BUDGET_CATEGORIES_TRANSLATIONS[props.data?.name as keyof typeof BUDGET_CATEGORIES_TRANSLATIONS] ||
+              props.data?.name}
+          </span>
         </th>
         <th scope="row" class="col-type-text whitespace-nowrap px-6 py-4 font-medium text-gray-900">
           <span class="txt-ellipsis">

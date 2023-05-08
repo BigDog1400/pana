@@ -14,6 +14,7 @@ import { initPocketBase } from '~/db';
 import { AiFillCheckCircle } from 'solid-icons/ai';
 import { Input, Select } from '~/modules/ui/components/form';
 import { Button } from '~/modules/ui/components/button';
+import { A } from 'solid-start';
 
 interface Props {
   className?: string;
@@ -133,12 +134,12 @@ export function DrawerAccountForm(props: Props) {
 
                 <p class="text-lg text-gray-900">You can now add transactions to your account</p>
                 <div class="mt-10">
-                  <a
-                    href="#"
+                  <A
+                    href="/app/transactions"
                     class="inline-flex w-full items-center  rounded border border-transparent bg-black px-6 py-4 text-base font-bold text-white shadow-sm  hover:bg-opacity-90"
                   >
                     Add transactions
-                  </a>
+                  </A>
                 </div>
               </div>
             }

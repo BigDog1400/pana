@@ -1,15 +1,36 @@
 import NavBar from '~/components/nav-bar';
 import { RiSystemAddFill } from 'solid-icons/ri';
-import { createEffect, createSignal, For, lazy, onMount, Show, Suspense } from 'solid-js';
+import { createEffect, createSignal, For, lazy, onCleanup, onMount, Show, Suspense } from 'solid-js';
 import { DrawerAccountForm } from '~/components/drawer-account-form';
 import { createServerData$ } from 'solid-start/server';
-import { RouteDataArgs, useRouteData } from 'solid-start';
+import { RouteDataArgs, useRouteData, useSearchParams } from 'solid-start';
 import { initPocketBase } from '~/db';
 import { ListResult } from 'pocketbase';
 import { TbArrowRight, TbDots } from 'solid-icons/tb';
 import { Button } from '~/modules/ui/components/button';
-import { A, useSearchParams } from '@solidjs/router';
+import Shepherd from 'shepherd.js';
+import 'shepherd.js/dist/css/shepherd.css';
+import { checkLocalStorageForTourDisplay, setLocalStorageForTourCompleted } from '~/utils/localstorage-tour';
+import { drawerAccountFormIsOpen } from '~/global-signals/drawer-account-form-is-open';
 
+const tour = new Shepherd.Tour({
+  useModalOverlay: true,
+  defaultStepOptions: {
+    cancelIcon: {
+      enabled: false,
+    },
+    classes: 'class-1 class-2',
+    scrollTo: { behavior: 'smooth', block: 'center' },
+    when: {
+      hide() {
+        setLocalStorageForTourCompleted('account-tour-completed');
+      },
+      cancel() {
+        setLocalStorageForTourCompleted('account-tour-completed');
+      },
+    },
+  },
+});
 interface Account {
   account_type_id: string;
   collectionId: string;
@@ -79,8 +100,67 @@ export function routeData({ params }: RouteDataArgs) {
 }
 
 export default function Wallets() {
-  const [isOpen, setIsOpen] = createSignal(false);
+  const [isOpen, setIsOpen] = drawerAccountFormIsOpen;
   const accounts = useRouteData<typeof routeData>();
+  const [searchParams, setSearchParams] = useSearchParams();
+
+  onMount(() => {
+    if (checkLocalStorageForTourDisplay('account-tour-completed')) return;
+    // Add event listener to #add-account-button to trigger next step
+    const addTransactionButton = document.getElementById('add-account-button');
+
+    if (addTransactionButton) {
+      addTransactionButton.addEventListener('click', () => {
+        setTimeout(() => {
+          tour.next();
+        }, 500);
+      });
+    }
+    tour.addStep({
+      title: 'Adding your first account',
+      text: `Add your first account to get started. You can add more accounts later.`,
+      attachTo: {
+        element: '#add-account-button',
+        on: 'bottom',
+      },
+      classes: '',
+      id: 'creating',
+      on(event, handler) {
+        alert(event);
+      },
+    });
+
+    tour.addStep({
+      title: 'Adding your first account',
+      text: `Add a name for your account, select the type and the current balance.`,
+      modalOverlayOpeningPadding: 5,
+      cancelIcon: {
+        enabled: true,
+      },
+      attachTo: {
+        element: '#account-form',
+        on: 'bottom',
+      },
+      id: 'creating2',
+      buttons: [
+        {
+          action() {
+            const form = document.getElementById('account-form');
+            if (form) {
+              (form as HTMLFormElement).requestSubmit();
+            }
+            return this.next();
+          },
+          text: 'Add account',
+        },
+      ],
+    });
+    tour.start();
+  });
+
+  onCleanup(() => {
+    setIsOpen(false);
+  });
 
   onMount(() => {
     const addAccountButton = document.getElementById('add-account');
@@ -92,7 +172,7 @@ export default function Wallets() {
   });
   return (
     <>
-      <NavBar
+      {/* <NavBar
         rightElement={
           <button
             class="inline-flex  h-10 items-center gap-2 rounded-[3px] border-2
@@ -104,13 +184,19 @@ export default function Wallets() {
             text-black
             hover:bg-gray-100
             "
-            onClick={() => setIsOpen(true)}
+            onClick={() => {
+              setIsOpen(true);
+              setTimeout(() => {
+                tour.next();
+              }, 1000);
+            }}
+            id="add-account-button"
           >
             <RiSystemAddFill />
             Agregar Cartera
           </button>
         }
-      />
+      /> */}
       <div class="mb-20">
         <div class="relative overflow-x-auto">
           <table class="table-wrapper w-full text-left text-sm text-gray-500 ">
@@ -153,29 +239,29 @@ export default function Wallets() {
                   </tr>
                 }
               >
-                <Show when={accounts()}>
-                  <For
-                    each={accounts()?.items}
-                    fallback={
-                      <tr class="border-b hover:bg-gray-100 ">
-                        <td class="w-4 p-4 text-center" colSpan={99}>
-                          <h6>No account found</h6>
-                          <Button
-                            variant={'outline'}
-                            class="mt-4"
-                            fw="semibold"
-                            id="add-account"
-                            onclick={() => setIsOpen(true)}
-                          >
-                            <RiSystemAddFill class="font-semibold" />
-                            Add account
-                          </Button>
-                        </td>
-                      </tr>
-                    }
-                  >
+                <Show
+                  when={accounts()}
+                  fallback={
+                    <tr class="border-b hover:bg-gray-100 ">
+                      <td class="w-4 p-4 text-center">
+                        <h6>No accounts yet</h6>
+                        <Button
+                          variant={'outline'}
+                          class="mt-4"
+                          fw="semibold"
+                          id="add-account"
+                          onclick={() => setIsOpen(true)}
+                        >
+                          <RiSystemAddFill class="font-semibold" />
+                          Add account
+                        </Button>
+                      </td>
+                    </tr>
+                  }
+                >
+                  <For each={accounts()?.items}>
                     {(item) => (
-                      <tr class="border-b hover:bg-gray-100 ">
+                      <tr class="border-b hover:bg-gray-100">
                         <td class="w-4 p-4">
                           <div class="flex items-center">
                             <input id="checkbox-table-search-3" type="checkbox" class="h-5 w-5 cursor-pointer" />
@@ -184,9 +270,7 @@ export default function Wallets() {
                             </label>
                           </div>
                         </td>
-                        <th scope="row" class="whitespace-nowrap px-6 py-4 font-medium text-gray-900 ">
-                          {item.name}
-                        </th>
+                        <td class="whitespace-nowrap px-6 py-4 font-medium text-gray-900 ">{item.name}</td>
 
                         <td class="px-6 py-4 font-semibold">
                           <span class={item.current_balance < 0 ? 'text-red-500' : 'text-green-500'}>

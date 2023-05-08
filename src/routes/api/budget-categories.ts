@@ -1,6 +1,7 @@
 import { APIEvent, json } from 'solid-start/api';
 import { initPocketBase } from '~/db';
 import { ClientResponseError } from 'pocketbase';
+
 export async function GET({ params, request }: APIEvent) {
   try {
     const pb = await initPocketBase(request);
