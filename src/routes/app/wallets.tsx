@@ -1,6 +1,6 @@
 import NavBar from '~/components/nav-bar';
 import { RiSystemAddFill } from 'solid-icons/ri';
-import { createEffect, createSignal, For, lazy, onMount, Show, Suspense } from 'solid-js';
+import { createEffect, createSignal, For, lazy, onCleanup, onMount, Show, Suspense } from 'solid-js';
 import { DrawerAccountForm } from '~/components/drawer-account-form';
 import { createServerData$ } from 'solid-start/server';
 import { RouteDataArgs, useRouteData, useSearchParams } from 'solid-start';
@@ -156,6 +156,10 @@ export default function Wallets() {
       ],
     });
     tour.start();
+  });
+
+  onCleanup(() => {
+    setIsOpen(false);
   });
 
   onMount(() => {

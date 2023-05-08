@@ -1,6 +1,6 @@
 import { RiSystemAddFill } from 'solid-icons/ri';
 import { TbDots } from 'solid-icons/tb';
-import { createSignal, For, onMount, Show, Suspense } from 'solid-js';
+import { createSignal, For, onCleanup, onMount, Show, Suspense } from 'solid-js';
 import { ErrorBoundary, RouteDataArgs, useRouteData } from 'solid-start';
 import { createServerData$ } from 'solid-start/server';
 import { DrawerTransactionForm } from '~/components/drawer-transaction-form';
@@ -168,6 +168,10 @@ export default function Transactions() {
     });
 
     tour.start();
+  });
+
+  onCleanup(() => {
+    setIsOpen(false);
   });
 
   return (
