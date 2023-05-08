@@ -52,7 +52,7 @@ function DrawerContent(props: { children: JSX.Element; class?: string }) {
     >
       <div
         class={cx(
-          `relative z-[100] flex h-screen w-full flex-col  justify-between overflow-hidden bg-white p-6 text-left align-middle shadow-xl`,
+          `relative z-[100] flex h-screen w-full flex-col justify-between overflow-auto bg-white p-6 text-left align-middle shadow-xl`,
           props.class,
         )}
       >
