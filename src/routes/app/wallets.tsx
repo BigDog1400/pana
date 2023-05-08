@@ -21,6 +21,14 @@ const tour = new Shepherd.Tour({
     },
     classes: 'class-1 class-2',
     scrollTo: { behavior: 'smooth', block: 'center' },
+    when: {
+      hide() {
+        setLocalStorageForTourCompleted('account-tour-completed');
+      },
+      cancel() {
+        setLocalStorageForTourCompleted('account-tour-completed');
+      },
+    },
   },
 });
 interface Account {
@@ -146,14 +154,6 @@ export default function Wallets() {
           text: 'Add account',
         },
       ],
-      when: {
-        hide() {
-          setLocalStorageForTourCompleted('account-tour-completed');
-        },
-        cancel() {
-          setLocalStorageForTourCompleted('account-tour-completed');
-        },
-      },
     });
     tour.start();
   });
