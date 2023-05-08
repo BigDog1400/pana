@@ -14,6 +14,7 @@ import { ClientResponseError } from 'pocketbase';
 import { DrawerBudgetForm } from '~/components/drawer-budget-form';
 import { BUDGET_GROUPS_TRANSLATIONS } from '~/utils/budget_groups_translations';
 import { BUDGET_CATEGORIES_TRANSLATIONS } from '~/utils/budget_categories_translations';
+import { drawerBudgetFormIsOpen } from '~/global-signals/drawer-budget-form-is-open';
 
 export interface Root2 {
   collectionId: string;
@@ -147,7 +148,7 @@ export function routeData({ location }: RouteDataArgs) {
 
 export default function Budget() {
   const budgets = useRouteData<typeof routeData>();
-  const [showDrawer, setShowDrawer] = createSignal(false);
+  const [showDrawer, setShowDrawer] = drawerBudgetFormIsOpen;
   const location = useLocation();
 
   const getPreviousDate = () => {
@@ -174,7 +175,7 @@ export default function Budget() {
 
   return (
     <>
-      <NavBar
+      {/* <NavBar
         rightElement={
           <div class="flex flex-wrap gap-2">
             <Button variant={'outline'} fw={'semibold'} onClick={() => setShowDrawer(true)}>
@@ -203,8 +204,8 @@ export default function Budget() {
             </div>
           </div>
         }
-      />
-      <div class="">
+      /> */}
+      <div class="mt-2">
         <div class="flex flex-wrap items-center justify-end gap-2 px-2 pb-2 lg:hidden">
           <A
             href={getPreviousDate()}

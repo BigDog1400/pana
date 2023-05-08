@@ -12,6 +12,7 @@ import 'shepherd.js/dist/css/shepherd.css';
 import { checkLocalStorageForTourDisplay, setLocalStorageForTourCompleted } from '~/utils/localstorage-tour';
 import { BUDGET_CATEGORIES_TRANSLATIONS } from '~/utils/budget_categories_translations';
 import { INCOME_CATEGORIES_TRANSLATIONS } from '~/utils/income_categories_translations';
+import { drawerTransactionFormIsOpen } from '~/global-signals/drawer-transaction-form-is-open';
 
 const tour = new Shepherd.Tour({
   useModalOverlay: true,
@@ -96,7 +97,7 @@ export function routeData({ params }: RouteDataArgs) {
 }
 
 export default function Transactions() {
-  const [isOpen, setIsOpen] = createSignal(false);
+  const [isOpen, setIsOpen] = drawerTransactionFormIsOpen;
   const transactions = useRouteData<typeof routeData>();
   onMount(() => {
     if (checkLocalStorageForTourDisplay('transaction-tour-completed')) return;
@@ -162,7 +163,7 @@ export default function Transactions() {
 
   return (
     <>
-      <NavBar
+      {/* <NavBar
         rightElement={
           // add wallet button
 
@@ -188,7 +189,7 @@ export default function Transactions() {
             Add transaction
           </button>
         }
-      />
+      /> */}
       <div class="mb-20">
         <div class="relative overflow-x-auto">
           <table class="table-wrapper w-full text-left text-sm text-gray-500 ">
@@ -236,21 +237,21 @@ export default function Transactions() {
                   </tr>
                 }
               >
-                <Show when={transactions()}>
-                  <For
-                    each={transactions()?.items}
-                    fallback={
-                      <tr class="border-b hover:bg-gray-100 ">
-                        <td class="w-4 p-4 text-center" colSpan={99}>
-                          <h6>No transactions found</h6>
-                          <Button variant={'outline'} class="mt-4" onClick={() => setIsOpen(true)} fw="semibold">
-                            <RiSystemAddFill class="font-semibold" />
-                            Add transaction
-                          </Button>
-                        </td>
-                      </tr>
-                    }
-                  >
+                <Show
+                  when={transactions()}
+                  fallback={
+                    <tr class="border-b hover:bg-gray-100 ">
+                      <td class="w-4 p-4 text-center" colSpan={99}>
+                        <h6>No transactions found</h6>
+                        <Button variant={'outline'} class="mt-4" onClick={() => setIsOpen(true)} fw="semibold">
+                          <RiSystemAddFill class="font-semibold" />
+                          Add transaction
+                        </Button>
+                      </td>
+                    </tr>
+                  }
+                >
+                  <For each={transactions()?.items}>
                     {(item) => (
                       <tr class="border-b hover:bg-gray-100 ">
                         <td class="w-4 p-4">
