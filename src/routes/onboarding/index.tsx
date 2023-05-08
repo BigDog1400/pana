@@ -1,8 +1,7 @@
-import { ClientResponseError } from 'pocketbase';
-import { APIEvent, json, redirect } from 'solid-start/api';
+import { CgSpinnerAlt } from 'solid-icons/cg';
+import { createResource } from 'solid-js';
+import { createServerData$, redirect } from 'solid-start/server';
 import { initPocketBase } from '~/db';
-import { BUDGET_CATEGORIES_TRANSLATIONS } from '~/utils/budget_categories_translations';
-import { BUDGET_GROUPS_TRANSLATIONS } from '~/utils/budget_groups_translations';
 
 const budget_groups = [
   {
@@ -141,15 +140,10 @@ const budget_groups = [
   },
 ];
 
-export async function GET({ params, request }: APIEvent) {
-  console.log('params', params);
-  try {
+export function routeData() {
+  return createServerData$(async (_, { request }) => {
     const pb = await initPocketBase(request);
     const userId = pb.authStore.model?.id;
-    // const resultList = await pb.collection('budget_groups').create({
-    //   name: '',
-    //   user_id: userId,
-    // })
 
     // For each budget group, create a budget group record
     // For each budget category, create a budget category record
@@ -187,15 +181,20 @@ export async function GET({ params, request }: APIEvent) {
         return budgetGroup;
       }),
     );
+
     return redirect('/app/wallets', {
       headers: {
         'Set-Cookie': pb.authStore.exportToCookie(),
       },
     });
-  } catch (error) {
-    if (error instanceof ClientResponseError) {
-      return json({ error: error.data.message, status: error.status }, { status: error.status });
-    }
-    return json({ error: 'Unexpected server error.', status: 500 }, { status: 500 });
-  }
+  });
+}
+
+export default function Onboarding() {
+  return (
+    // big screen with a loading in the middle and a message saying "loading", use tailwindcss
+    <div class="flex h-screen flex-col items-center justify-center">
+      <CgSpinnerAlt class="text-primary h-10 w-10 animate-spin" />
+    </div>
+  );
 }

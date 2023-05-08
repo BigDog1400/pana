@@ -98,6 +98,16 @@ export default function Wallets() {
 
   onMount(() => {
     if (checkLocalStorageForTourDisplay('account-tour-completed')) return;
+    // Add event listener to #add-account-button to trigger next step
+    const addTransactionButton = document.getElementById('add-account-button');
+
+    if (addTransactionButton) {
+      addTransactionButton.addEventListener('click', () => {
+        setTimeout(() => {
+          tour.next();
+        }, 500);
+      });
+    }
     tour.addStep({
       title: 'Adding your first account',
       text: `Add your first account to get started. You can add more accounts later.`,

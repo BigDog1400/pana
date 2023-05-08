@@ -50,7 +50,7 @@ const mobileNavigationBottomItems: NavigationItemType[] = [
 function WalletCTA() {
   const [_, setIsOpen] = drawerAccountFormIsOpen;
   return (
-    <Button variant="outline" color="primary" onClick={() => setIsOpen(true)}>
+    <Button variant="outline" color="primary" onClick={() => setIsOpen(true)} id="add-account-button">
       <RiSystemAddFill />
       Add account
     </Button>
@@ -60,7 +60,7 @@ function WalletCTA() {
 function TransactionsCTA() {
   const [_, setIsOpen] = drawerTransactionFormIsOpen;
   return (
-    <Button variant="outline" color="primary" onClick={() => setIsOpen(true)}>
+    <Button variant="outline" color="primary" onClick={() => setIsOpen(true)} id="add-transaction-button">
       <RiSystemAddFill />
       Add transaction
     </Button>

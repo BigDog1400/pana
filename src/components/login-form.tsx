@@ -1,7 +1,7 @@
 import PocketBase, { ClientResponseError } from 'pocketbase';
 import { Show } from 'solid-js';
 import { FormError } from 'solid-start';
-import { createServerAction$, redirect } from 'solid-start/server';
+import { createServerAction$, json, redirect } from 'solid-start/server';
 import { cookieSessionStorage } from '~/db/session';
 // import { createUserSession, login, register } from '~/db/session';
 import './style.css';
@@ -97,7 +97,7 @@ export function LoginForm() {
           await pb.collection('users').authWithPassword(email, password);
 
           // If the user was successfully created, redirect to the specified location and set the auth cookie
-          return redirect('/api/setup', {
+          return redirect('/onboarding', {
             headers: {
               'Set-Cookie': pb.authStore.exportToCookie(),
             },

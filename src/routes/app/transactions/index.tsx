@@ -101,7 +101,16 @@ export default function Transactions() {
   const transactions = useRouteData<typeof routeData>();
   onMount(() => {
     if (checkLocalStorageForTourDisplay('transaction-tour-completed')) return;
+    // Add event listener to #add-transaction-button to trigger next step
+    const addTransactionButton = document.getElementById('add-transaction-button');
 
+    if (addTransactionButton) {
+      addTransactionButton.addEventListener('click', () => {
+        setTimeout(() => {
+          tour.next();
+        }, 500);
+      });
+    }
     tour.addStep({
       title: 'Adding your first transaction',
       text: `Click on the button above to add your first transaction.`,
