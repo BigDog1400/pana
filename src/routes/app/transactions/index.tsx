@@ -176,33 +176,6 @@ export default function Transactions() {
 
   return (
     <>
-      {/* <NavBar
-        rightElement={
-          // add wallet button
-
-          <button
-            class="inline-flex  h-10 items-center gap-2 rounded-[3px] border-2
-            border-black
-            bg-white
-            px-5 py-1
-            text-sm
-            font-semibold
-            text-black
-            hover:bg-gray-100
-            "
-            onClick={() => {
-              setIsOpen(true);
-              setTimeout(() => {
-                tour.next();
-              }, 500);
-            }}
-            id="add-transaction-button"
-          >
-            <RiSystemAddFill />
-            Add transaction
-          </button>
-        }
-      /> */}
       <div class="mb-20">
         <div class="relative overflow-x-auto">
           <table class="table-wrapper w-full text-left text-sm text-gray-500 ">

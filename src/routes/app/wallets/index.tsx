@@ -3,7 +3,7 @@ import { RiSystemAddFill } from 'solid-icons/ri';
 import { createEffect, createSignal, For, lazy, onCleanup, onMount, Show, Suspense } from 'solid-js';
 import { DrawerAccountForm } from '~/components/drawer-account-form';
 import { createServerData$ } from 'solid-start/server';
-import { RouteDataArgs, useRouteData, useSearchParams } from 'solid-start';
+import { A, RouteDataArgs, useNavigate, useRouteData, useSearchParams } from 'solid-start';
 import { initPocketBase } from '~/db';
 import { ListResult } from 'pocketbase';
 import { TbArrowRight, TbDots } from 'solid-icons/tb';
@@ -103,6 +103,7 @@ export default function Wallets() {
   const [isOpen, setIsOpen] = drawerAccountFormIsOpen;
   const accounts = useRouteData<typeof routeData>();
   const [searchParams, setSearchParams] = useSearchParams();
+  const navigate = useNavigate();
 
   onMount(() => {
     if (checkLocalStorageForTourDisplay('account-tour-completed')) return;
@@ -172,31 +173,6 @@ export default function Wallets() {
   });
   return (
     <>
-      {/* <NavBar
-        rightElement={
-          <button
-            class="inline-flex  h-10 items-center gap-2 rounded-[3px] border-2
-            border-black
-            bg-white
-            px-5 py-1
-            text-sm
-            font-semibold
-            text-black
-            hover:bg-gray-100
-            "
-            onClick={() => {
-              setIsOpen(true);
-              setTimeout(() => {
-                tour.next();
-              }, 1000);
-            }}
-            id="add-account-button"
-          >
-            <RiSystemAddFill />
-            Agregar Cartera
-          </button>
-        }
-      /> */}
       <div class="mb-20">
         <div class="relative overflow-x-auto">
           <table class="table-wrapper w-full text-left text-sm text-gray-500 ">
@@ -261,7 +237,16 @@ export default function Wallets() {
                 >
                   <For each={accounts()?.items}>
                     {(item) => (
-                      <tr class="border-b hover:bg-gray-100">
+                      <tr
+                        class="cursor-pointer border-b hover:bg-gray-100"
+                        tabIndex="0"
+                        onkeydown={(e) => {
+                          navigate(`/app/wallets/${item.id}`);
+                        }}
+                        onclick={() => {
+                          navigate(`/app/wallets/${item.id}`);
+                        }}
+                      >
                         <td class="w-4 p-4">
                           <div class="flex items-center">
                             <input id="checkbox-table-search-3" type="checkbox" class="h-5 w-5 cursor-pointer" />
@@ -270,7 +255,11 @@ export default function Wallets() {
                             </label>
                           </div>
                         </td>
-                        <td class="whitespace-nowrap px-6 py-4 font-medium text-gray-900 ">{item.name}</td>
+                        <td class="whitespace-nowrap px-6 py-4 font-medium text-gray-900 ">
+                          <A href={`/app/wallets/${item.id}`} class="font-semibold">
+                            <span>{item.name}</span>
+                          </A>
+                        </td>
 
                         <td class="px-6 py-4 font-semibold">
                           <span class={item.current_balance < 0 ? 'text-red-500' : 'text-green-500'}>
