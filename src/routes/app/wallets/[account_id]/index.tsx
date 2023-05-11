@@ -77,6 +77,7 @@ export function routeData({ params }: RouteDataArgs) {
       const accountBalance = await pb.collection('accounts_balance').getOne<AccountBalanceRoot>(id);
       const accountTransactions = await pb.collection('transactions').getFullList<TransactionListItem>(undefined, {
         expand: 'budget_cat_id_,income_category_id',
+        filter: `account_id = "${id}"`,
       });
 
       return { account_balance: accountBalance, account_data: accountData, account_transactions: accountTransactions };
