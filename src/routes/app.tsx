@@ -23,7 +23,7 @@ export type NavigationItemType = {
 export type HeadingItemType = {
   title: string;
   subtitle?: string;
-  CTA: JSX.Element;
+  CTA?: JSX.Element;
   showBackButton?: boolean;
   backButtonHref?: string;
   rootPathRegex?: string;
@@ -88,7 +88,7 @@ const headingItems: HeadingItemType[] = [
     title: 'Wallet Details',
 
     rootPathRegex: '/app/wallets/[0-9a-zA-Z]+$',
-    CTA: <WalletCTA />,
+    // CTA: <WalletCTA />,
     showBackButton: true,
   },
   {
