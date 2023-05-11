@@ -26,7 +26,7 @@ export type HeadingItemType = {
   CTA: JSX.Element;
   showBackButton?: boolean;
   backButtonHref?: string;
-  rootPath?: string;
+  rootPathRegex?: string;
 };
 
 const mobileNavigationBottomItems: NavigationItemType[] = [
@@ -80,19 +80,27 @@ function BudgetsCTA() {
 const headingItems: HeadingItemType[] = [
   {
     title: 'Wallets',
-    rootPath: '/app/wallets',
+    rootPathRegex: '/app/wallets$',
     CTA: <WalletCTA />,
     showBackButton: false,
   },
   {
+    title: 'Wallet Details',
+
+    rootPathRegex: '/app/wallets/[0-9a-zA-Z]+$',
+    CTA: <WalletCTA />,
+    showBackButton: true,
+  },
+  {
     title: 'Transactions',
-    rootPath: '/app/transactions',
+
+    rootPathRegex: '/app/transactions$',
     CTA: <TransactionsCTA />,
     showBackButton: false,
   },
   {
     title: 'Budgets',
-    rootPath: '/app/budgets',
+    rootPathRegex: '/app/budgets$',
     CTA: <BudgetsCTA />,
     showBackButton: false,
   },
@@ -162,7 +170,12 @@ export function ShellMain(props: { children: any }) {
   const location = useLocation();
 
   const currentHeading = createMemo(() => {
-    const currentHeadingItem = headingItems.find((item) => item.rootPath?.startsWith(location.pathname));
+    const currentHeadingItem = headingItems.find((item) => {
+      if (item.rootPathRegex) {
+        return new RegExp(item.rootPathRegex).test(location.pathname);
+      }
+      return false;
+    });
     if (currentHeadingItem) {
       return currentHeadingItem;
     }
@@ -173,9 +186,9 @@ export function ShellMain(props: { children: any }) {
     <>
       <div class={cx('flex items-center px-4 md:mb-6 md:mt-0')}>
         {currentHeading()?.showBackButton && (
-          <A color="minimal" aria-label="Go Back" class="hover:bg-default mr-2 flex-shrink-0 rounded-full p-2" href="/">
+          <Button aria-label="Go Back" variant={'outline'} class="mr-2" onClick={() => history.back()}>
             <CgArrowLeft />
-          </A>
+          </Button>
         )}
         {currentHeading() !== null && (
           <header class={cx('flex w-full max-w-full items-center truncate')}>
