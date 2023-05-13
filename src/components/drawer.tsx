@@ -6,7 +6,7 @@ import {
   TransitionChild,
   DialogOverlay,
 } from 'solid-headless';
-import { createEffect } from 'solid-js';
+import { createEffect, onCleanup } from 'solid-js';
 import type { JSX } from 'solid-js/jsx-runtime';
 type DrawerProps = {
   children: JSX.Element;
@@ -16,14 +16,11 @@ type DrawerProps = {
 };
 
 function Drawer(props: DrawerProps) {
-  createEffect(() => {
-    if (props.isOpen) {
-      document.body.style.overflow = 'hidden';
-    } else {
-      // Remove the overflow hidden to the body
-      document.body.style.overflow = '';
-    }
+  onCleanup(() => {
+    // Remove the overflow hidden to the body
+    document.body.style.overflow = '';
   });
+
   return (
     <Transition appear show={props.isOpen}>
       <Dialog isOpen class={`fixed right-0 top-0 z-50 overflow-y-auto ${props.class ?? ''}`} onClose={props.onToggle}>
