@@ -86,6 +86,7 @@ export function routeData({ params }: RouteDataArgs) {
         };
       }>(1, 50, {
         expand: 'budget_cat_id_,account_id,income_category_id',
+        sort: '-date',
       });
 
       return resultList;
@@ -256,6 +257,7 @@ export default function Transactions() {
                             year: 'numeric',
                             month: 'long',
                             day: '2-digit',
+                            timeZone: 'UTC',
                           }).format(new Date(item.date))}
                         </th>
                         <th scope="row" class="whitespace-nowrap px-6 py-4 font-semibold text-gray-900 ">
