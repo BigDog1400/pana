@@ -175,38 +175,8 @@ export default function Budget() {
 
   return (
     <>
-      {/* <NavBar
-        rightElement={
-          <div class="flex flex-wrap gap-2">
-            <Button variant={'outline'} fw={'semibold'} onClick={() => setShowDrawer(true)}>
-              <RiSystemAddFill />
-              Add budget group
-            </Button>
-            <div class="hidden lg:block">
-              <A
-                href={getPreviousDate()}
-                class="inline-flex min-h-[2.5rem] items-center justify-center gap-2 rounded-md border-2 border-black bg-transparent py-1 px-5 text-sm font-semibold text-black transition-all hover:bg-opacity-90"
-              >
-                <TbArrowLeft />
-              </A>
-              <span class="mx-2 font-semibold capitalize text-gray-500">
-                {new Date(
-                  Number(location.query['y']) || new Date().getFullYear(),
-                  location.query['m'] ? Number(location.query['m']) : new Date().getMonth(),
-                ).toLocaleString('default', { month: 'long', year: 'numeric' })}
-              </span>
-              <A
-                href={getNextDate()}
-                class="inline-flex min-h-[2.5rem] items-center justify-center gap-2 rounded-md border-2 border-black bg-transparent py-1 px-5 text-sm font-semibold text-black transition-all hover:bg-opacity-90"
-              >
-                <TbArrowRight />
-              </A>
-            </div>
-          </div>
-        }
-      /> */}
       <div class="mt-2">
-        <div class="flex flex-wrap items-center justify-end gap-2 px-2 pb-2 lg:hidden">
+        <div class="flex flex-wrap items-center justify-end gap-2 px-2 pb-2 ">
           <A
             href={getPreviousDate()}
             class="inline-flex min-h-[2.5rem] items-center justify-center gap-2 rounded-md border-2 border-black bg-transparent py-1 px-5 text-sm font-semibold text-black transition-all hover:bg-opacity-90"
@@ -329,6 +299,23 @@ function BudgetGroup(props: { group: Root2 }) {
 function BudgetCategory(props: { data: BudgetCategoriesGroupId }) {
   const [showCreateModal, setShowCreateModal] = createSignal(false);
   const [showUpdateModal, setShowUpdateModal] = createSignal(false);
+
+  const budgetedAmount = () =>
+    typeof props.data.expand.budget_target?.budgeted_amount === 'undefined'
+      ? 0
+      : props.data.expand.budget_target?.budgeted_amount;
+
+  const expendTargetAmount = () =>
+    typeof props.data.expand.budget_target?.expend === 'undefined' ? 0 : props.data.expand.budget_target?.expend;
+
+  const budgetedAmountIsGreaterThanExpend = () => {
+    return budgetedAmount() >= expendTargetAmount();
+  };
+
+  const availableAmount = () => {
+    return budgetedAmount() + expendTargetAmount();
+  };
+
   return (
     <>
       <tr
@@ -365,35 +352,56 @@ function BudgetCategory(props: { data: BudgetCategoriesGroupId }) {
           </div>
         </td>
 
-        <th scope="row" class="col-type-text px-6 py-4 font-medium text-gray-900">
+        <th scope="row" class="col-type-text !max-w-[100px] px-6 py-4 font-medium text-gray-900">
           <span class="txt-ellipsis">
             {BUDGET_CATEGORIES_TRANSLATIONS[props.data?.name as keyof typeof BUDGET_CATEGORIES_TRANSLATIONS] ||
               props.data?.name}
           </span>
         </th>
-        <th scope="row" class="col-type-text whitespace-nowrap px-6 py-4 font-medium text-gray-900">
+        <th
+          scope="row"
+          class={`col-type-text whitespace-nowrap px-6 py-4 font-semibold ${
+            budgetedAmountIsGreaterThanExpend()
+              ? budgetedAmount() === 0
+                ? 'text-gray-500'
+                : 'text-green-500'
+              : 'text-red-500'
+          }`}
+        >
           <span class="txt-ellipsis">
             {new Intl.NumberFormat('en-US', {
               style: 'currency',
               currency: 'USD',
-            }).format(props.data.expand.budget_target?.budgeted_amount || 0)}
+            }).format(budgetedAmount())}
           </span>
         </th>
-        <th scope="row" class="col-type-text whitespace-nowrap px-6 py-4 font-medium text-gray-900">
+        <th
+          scope="row"
+          class={`col-type-text whitespace-nowrap px-6 py-4 font-semibold ${
+            expendTargetAmount() > budgetedAmount()
+              ? 'text-red-500'
+              : expendTargetAmount() === 0
+              ? 'text-gray-500'
+              : 'text-black'
+          }`}
+        >
           <span class="txt-ellipsis">
             {new Intl.NumberFormat('en-US', {
               style: 'currency',
               currency: 'USD',
-            }).format(props.data.expand.budget_target?.expend || 0)}
+            }).format(expendTargetAmount())}
           </span>
         </th>
-        <th scope="row" class="col-type-text whitespace-nowrap px-6 py-4 font-medium text-gray-900">
-          {props.data.expand.budget_target?.budgeted_amount && props.data.expand.budget_target?.expend
-            ? new Intl.NumberFormat('en-US', {
-                style: 'currency',
-                currency: 'USD',
-              }).format(props.data.expand.budget_target?.budgeted_amount + props.data.expand.budget_target?.expend)
-            : 0}
+        <th
+          scope="row"
+          class={`col-type-text whitespace-nowrap px-6 py-4 font-semibold ${
+            availableAmount() < 0 ? 'text-red-500' : availableAmount() === 0 ? 'text-gray-500' : 'text-green-500'
+          }`}
+        >
+          {new Intl.NumberFormat('en-US', {
+            style: 'currency',
+            currency: 'USD',
+          }).format(availableAmount())}
         </th>
 
         <td class="w-[1%] space-x-3 px-6 py-4 text-lg">
