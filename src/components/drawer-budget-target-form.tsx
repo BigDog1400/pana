@@ -71,6 +71,7 @@ export function DrawerBudgetTargetForm(props: Props) {
   }>();
 
   createEffect(async () => {
+    if (!enrolling.input) return;
     if (enrolling.result?.ok) {
       let data = await enrolling.result.json();
       setResult(data);
