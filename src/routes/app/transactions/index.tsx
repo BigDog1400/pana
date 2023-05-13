@@ -86,6 +86,7 @@ export function routeData({ params }: RouteDataArgs) {
         };
       }>(1, 50, {
         expand: 'budget_cat_id_,account_id,income_category_id',
+        sort: '-date',
       });
 
       return resultList;
