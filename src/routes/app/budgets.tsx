@@ -392,7 +392,7 @@ function BudgetCategory(props: { data: BudgetCategoriesGroupId }) {
             ? new Intl.NumberFormat('en-US', {
                 style: 'currency',
                 currency: 'USD',
-              }).format(props.data.expand.budget_target?.budgeted_amount - props.data.expand.budget_target?.expend)
+              }).format(props.data.expand.budget_target?.budgeted_amount + props.data.expand.budget_target?.expend)
             : 0}
         </th>
 
