@@ -198,8 +198,7 @@ export default function Budget() {
         </div>
 
         <Suspense fallback={<div class="flex items-center justify-center">Loading...</div>}>
-          <Show
-            when={budgets() !== undefined && Array.isArray(budgets()) && budgets()?.length! > 0}
+          <For
             fallback={
               <div class="text-center">
                 <h6 class="text-gray-500">No budgets found</h6>
@@ -209,9 +208,10 @@ export default function Budget() {
                 </Button>
               </div>
             }
+            each={budgets()}
           >
-            <For each={budgets()}>{(group) => <BudgetGroup group={group} />}</For>
-          </Show>
+            {(group) => <BudgetGroup group={group} />}
+          </For>
         </Suspense>
       </div>
       <DrawerBudgetForm isOpen={showDrawer()} onToggle={() => setShowDrawer((prev) => !prev)} />
