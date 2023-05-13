@@ -16,9 +16,10 @@ type DrawerProps = {
 };
 
 function Drawer(props: DrawerProps) {
-  onMount(() => {
-    // Add the overflow hidden to the body
-    document.body.style.overflow = 'hidden';
+  createEffect(() => {
+    if (props.isOpen) {
+      document.body.style.overflow = 'hidden';
+    }
   });
   onCleanup(() => {
     // Remove the overflow hidden to the body
