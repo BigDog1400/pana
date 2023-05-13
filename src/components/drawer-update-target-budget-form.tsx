@@ -74,7 +74,6 @@ export function DrawerUpdateTargetBudgetForm(props: Props) {
       let result: {
         success: boolean;
         error: {
-          
           data: {
             code: number;
             message: string;
@@ -135,6 +134,7 @@ export function DrawerUpdateTargetBudgetForm(props: Props) {
                   name="budgeted_amount"
                   id="budgeted_amount"
                   placeholder="Amount"
+                  step={0.01}
                   required
                   value={props.initialValues.amount}
                 />

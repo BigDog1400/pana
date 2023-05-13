@@ -132,7 +132,14 @@ export function DrawerBudgetTargetForm(props: Props) {
                 <label for="budgeted_amount" class="mb-2 block text-sm font-semibold text-gray-900">
                   Budget target
                 </label>
-                <Input type="number" name="budgeted_amount" id="budgeted_amount" placeholder="Amount" required />
+                <Input
+                  type="number"
+                  name="budgeted_amount"
+                  id="budgeted_amount"
+                  placeholder="Amount"
+                  required
+                  step={0.01}
+                />
               </fieldset>
               <input type="hidden" name="budget_cat_id" value={props.budgetCategory.id} />
               <input type="hidden" name="date" value={props.date.toISOString()} />
