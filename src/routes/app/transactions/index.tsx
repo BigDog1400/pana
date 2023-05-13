@@ -256,6 +256,7 @@ export default function Transactions() {
                             year: 'numeric',
                             month: 'long',
                             day: '2-digit',
+                            timeZone: 'UTC',
                           }).format(new Date(item.date))}
                         </th>
                         <th scope="row" class="whitespace-nowrap px-6 py-4 font-semibold text-gray-900 ">
