@@ -138,7 +138,7 @@ export function routeData({ location }: RouteDataArgs) {
         }),
       );
 
-      return updatedResultList;
+      return structuredClone(updatedResultList);
     },
     {
       key: () => ['budget_groups', location.query['m'], location.query['y']],
