@@ -160,6 +160,7 @@ export function DrawerAccountForm(props: Props) {
                   name="current_balance"
                   id="current_balance"
                   placeholder="Current Balance"
+                  step={0.01}
                   required
                 />
               </div>

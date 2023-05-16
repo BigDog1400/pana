@@ -201,7 +201,7 @@ export function DrawerTransactionForm(props: Props) {
                 <label for="amount" class="mb-2 block text-sm font-semibold text-gray-900">
                   Amount
                 </label>
-                <Input type="number" name="amount" id="amount" placeholder="Amount" required />
+                <Input type="number" step={0.01} name="amount" id="amount" placeholder="Amount" required />
               </fieldset>
               <Show when={data.state === 'ready'}>
                 <Show when={transaction() === 'expense'}>
