@@ -15,6 +15,7 @@ import { DrawerBudgetForm } from '~/components/drawer-budget-form';
 import { BUDGET_GROUPS_TRANSLATIONS } from '~/utils/budget_groups_translations';
 import { BUDGET_CATEGORIES_TRANSLATIONS } from '~/utils/budget_categories_translations';
 import { drawerBudgetFormIsOpen } from '~/global-signals/drawer-budget-form-is-open';
+import { cx } from 'cva';
 
 export interface Root2 {
   collectionId: string;
@@ -173,28 +174,86 @@ export default function Budget() {
     }
   };
 
+  const totalBudgeted = () =>
+    budgets()?.reduce((acc, curr) => {
+      return Number(
+        acc +
+          curr.expand['budget_categories(group_id)'].reduce((acc, curr) => {
+            return acc + (curr.expand?.['budget_target']?.budgeted_amount || 0);
+          }, 0),
+      );
+    }, 0) || 0;
+
+  const totalSpent = () =>
+    budgets()?.reduce((acc, curr) => {
+      return Number(
+        acc +
+          curr.expand['budget_categories(group_id)'].reduce((acc, curr) => {
+            return acc + (curr.expand?.['budget_target']?.expend || 0);
+          }, 0),
+      );
+    }, 0) || 0;
+
+  const totalAvailable = () => totalBudgeted() + totalSpent();
+
   return (
     <>
       <div class="mt-2">
-        <div class="flex flex-wrap items-center justify-end gap-2 px-2 pb-2 ">
-          <A
-            href={getPreviousDate()}
-            class="inline-flex min-h-[2.5rem] items-center justify-center gap-2 rounded-md border-2 border-black bg-transparent py-1 px-5 text-sm font-semibold text-black transition-all hover:bg-opacity-90"
-          >
-            <TbArrowLeft />
-          </A>
-          <span class="mx-2 font-semibold capitalize text-gray-500">
-            {new Date(
-              Number(location.query['y']) || new Date().getFullYear(),
-              location.query['m'] ? Number(location.query['m']) : new Date().getMonth(),
-            ).toLocaleString('default', { month: 'long', year: 'numeric' })}
-          </span>
-          <A
-            href={getNextDate()}
-            class="inline-flex min-h-[2.5rem] items-center justify-center gap-2 rounded-md border-2 border-black bg-transparent py-1 px-5 text-sm font-semibold text-black transition-all hover:bg-opacity-90"
-          >
-            <TbArrowRight />
-          </A>
+        <div class="flex flex-wrap items-center justify-between gap-2 px-2 pb-2 ">
+          <div class="flex flex-wrap items-center gap-6 px-2 py-4 md:justify-between md:gap-16 md:px-10">
+            <div class="w-full sm:w-auto">
+              <p class="text-sm text-gray-700 md:text-xl">Total Budgeted: </p>
+              <p class={cx('text-2xl font-semibold', totalBudgeted() < 0 ? 'text-red-500' : 'text-green-500')}>
+                {new Intl.NumberFormat('en-US', {
+                  style: 'currency',
+                  currency: 'USD',
+                }).format(totalBudgeted())}
+              </p>
+            </div>
+            <div class="">
+              <p class="text-sm text-gray-700 md:text-xl">Total Expend: </p>
+              <p
+                class={cx(
+                  'text-2xl font-semibold',
+                  Math.abs(totalSpent()) > Math.abs(totalBudgeted()) ? 'text-red-500' : 'text-green-500',
+                )}
+              >
+                {new Intl.NumberFormat('en-US', {
+                  style: 'currency',
+                  currency: 'USD',
+                }).format(totalSpent())}
+              </p>
+            </div>
+            <div class="">
+              <p class="text-sm text-gray-700 md:text-xl">Total Available: </p>
+              <p class={cx('text-2xl font-semibold', totalAvailable() < 0 ? 'text-red-500' : 'text-green-500')}>
+                {new Intl.NumberFormat('en-US', {
+                  style: 'currency',
+                  currency: 'USD',
+                }).format(totalAvailable())}
+              </p>
+            </div>
+          </div>
+          <div class="ml-auto flex items-center gap-2">
+            <A
+              href={getPreviousDate()}
+              class="inline-flex min-h-[2.5rem] items-center justify-center gap-2 rounded-md border-2 border-black bg-transparent py-1 px-5 text-sm font-semibold text-black transition-all hover:bg-opacity-90"
+            >
+              <TbArrowLeft />
+            </A>
+            <span class="mx-2 font-semibold capitalize text-gray-500">
+              {new Date(
+                Number(location.query['y']) || new Date().getFullYear(),
+                location.query['m'] ? Number(location.query['m']) : new Date().getMonth(),
+              ).toLocaleString('default', { month: 'long', year: 'numeric' })}
+            </span>
+            <A
+              href={getNextDate()}
+              class="inline-flex min-h-[2.5rem] items-center justify-center gap-2 rounded-md border-2 border-black bg-transparent py-1 px-5 text-sm font-semibold text-black transition-all hover:bg-opacity-90"
+            >
+              <TbArrowRight />
+            </A>
+          </div>
         </div>
 
         <Suspense fallback={<div class="flex items-center justify-center">Loading...</div>}>
